@@ -78,7 +78,11 @@ const verifiers: Record<string, () => number> = {
 	'classical/describing-motion#q1': () => 20 ** 2 / (2 * 5), // v² = v0² + 2aΔx with v = 0
 	'classical/describing-motion#q2': () => (8 - 2) / 3,
 	'classical/projectile-motion#q1': () => 12 ** 2 / (2 * g),
-	'classical/projectile-motion#q2': () => (10 ** 2 * Math.sin((2 * 45 * Math.PI) / 180)) / G
+	'classical/projectile-motion#q2': () => (10 ** 2 * Math.sin((2 * 45 * Math.PI) / 180)) / G,
+	'classical/simple-harmonic-motion#q1': () => 2 * Math.PI * Math.sqrt(0.25 / 25),
+	'classical/simple-harmonic-motion#q2': () => 0.03 * Math.sqrt(160 / 0.4),
+	'classical/damped-oscillations#q1': () => 2 * Math.sqrt(100 * 0.25),
+	'classical/damped-oscillations#q2': () => Math.LN2 / (0.5 / (2 * 1.0))
 };
 
 describe('numbers in lessons are verified', () => {
@@ -104,6 +108,68 @@ describe('numbers in lessons are verified', () => {
 		expect(v).toBe(12);
 		expect(6 * 4 + 0.5 * 1.5 * 4 ** 2).toBe(36);
 		expect(((6 + v) / 2) * 4).toBe(36);
+	});
+
+	it('simple-harmonic-motion worked example, faded example and energy checks', () => {
+		// worked example: m = 0.5 kg, k = 200 N/m, A = 0.04 m
+		const w = Math.sqrt(200 / 0.5);
+		expect(w).toBeCloseTo(20, 12);
+		expect((2 * Math.PI) / w).toBeCloseTo(0.314, 3);
+		expect(0.04 * w).toBeCloseTo(0.8, 12);
+		expect(0.04 * w ** 2).toBeCloseTo(16, 12);
+		expect(0.5 * 200 * 0.04 ** 2).toBeCloseTo(0.16, 12);
+		expect(0.5 * 0.5 * 0.8 ** 2).toBeCloseTo(0.16, 12);
+		expect(0.04 * Math.cos(w * 0.1)).toBeCloseTo(-0.0166, 4);
+		// faded example: m = 2 kg, k = 50 N/m, A = 0.1 m
+		const w2 = Math.sqrt(50 / 2);
+		expect(w2).toBe(5);
+		expect((2 * Math.PI) / w2).toBeCloseTo(1.26, 2);
+		expect(0.1 * w2).toBeCloseTo(0.5, 12);
+		expect(0.5 * 50 * 0.1 ** 2).toBeCloseTo(0.25, 12);
+		// q2 energy cross-check and q3 (four times the mass doubles the period)
+		expect(0.5 * 160 * 0.03 ** 2).toBeCloseTo(0.072, 12);
+		expect(0.5 * 0.4 * 0.6 ** 2).toBeCloseTo(0.072, 12);
+		expect(Math.sqrt(4)).toBe(2);
+		// the lab claim: omega0 = 2 rad/s gives a period of 3.14 s
+		expect((2 * Math.PI) / 2).toBeCloseTo(3.14, 2);
+	});
+
+	it('damped-oscillations worked example, faded example and the lab agreement', () => {
+		// worked example: m = 0.5, k = 200, b = 2
+		const w0 = Math.sqrt(200 / 0.5);
+		const zeta = 2 / (2 * Math.sqrt(200 * 0.5));
+		expect(zeta).toBeCloseTo(0.1, 12);
+		expect(zeta * w0).toBeCloseTo(2, 12);
+		expect(2 / (2 * 0.5)).toBeCloseTo(2, 12);
+		const w1 = w0 * Math.sqrt(1 - zeta ** 2);
+		expect(w1).toBeCloseTo(19.9, 1);
+		const period = (2 * Math.PI) / w1;
+		expect(period).toBeCloseTo(0.316, 3);
+		expect(Math.exp(-2 * period)).toBeCloseTo(0.53, 2);
+		expect(Math.LN2 / 2).toBeCloseTo(0.35, 2);
+		expect(2 * Math.sqrt(200 * 0.5)).toBe(20);
+		// faded example: m = 2, k = 50, b = 4
+		const z2 = 4 / (2 * Math.sqrt(50 * 2));
+		expect(z2).toBeCloseTo(0.2, 12);
+		expect(4 / (2 * 2)).toBe(1);
+		expect(Math.LN2 / 1).toBeCloseTo(0.69, 2);
+		expect(5 * Math.sqrt(1 - z2 ** 2)).toBeCloseTo(4.9, 2);
+		// "at zeta = 0.1 the frequency changes by only half a percent"
+		expect(1 - Math.sqrt(1 - 0.1 ** 2)).toBeCloseTo(0.005, 3);
+	});
+
+	it('the damped solution in the lesson matches the Rust-verified closed form', () => {
+		// x(t) = e^{-ζω0 t}(cos ω1 t + (ζω0/ω1) sin ω1 t) is one member of the lesson's family (A cos(ω1 t + φ) form); check it solves x'' + 2ζω0 x' + ω0² x = 0.
+		const w0 = 2;
+		const z = 0.3;
+		const w1 = w0 * Math.sqrt(1 - z * z);
+		const x = (t: number) => Math.exp(-z * w0 * t) * (Math.cos(w1 * t) + ((z * w0) / w1) * Math.sin(w1 * t));
+		const h = 1e-4;
+		for (const t of [0.5, 1.3, 2.7]) {
+			const d1 = (x(t + h) - x(t - h)) / (2 * h);
+			const d2 = (x(t + h) - 2 * x(t) + x(t - h)) / (h * h);
+			expect(Math.abs(d2 + 2 * z * w0 * d1 + w0 ** 2 * x(t))).toBeLessThan(1e-5);
+		}
 	});
 
 	it('projectile-motion worked example, faded example and notebook cross-reference', () => {
