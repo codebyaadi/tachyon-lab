@@ -1,0 +1,5 @@
+# Keep LF everywhere so formatters agree on Windows and in Linux CI.
+* text=auto eol=lf
+*.wasm binary
+*.png binary
+*.svg text eol=lf

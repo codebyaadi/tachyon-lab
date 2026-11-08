@@ -1,0 +1,14 @@
+[package]
+name = "physics-wasm"
+description = "Thin wasm-bindgen layer exposing Tachyon Lab simulations to the browser."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+physics = { path = "../physics" }
+# Must match the installed wasm-bindgen-cli version exactly (checked by scripts/build-wasm.mjs).
+wasm-bindgen = "=0.2.130"

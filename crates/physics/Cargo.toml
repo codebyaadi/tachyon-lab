@@ -1,0 +1,11 @@
+[package]
+name = "physics"
+description = "Tachyon Lab physics core: integrators, FFT, linear algebra, TDSE solvers. Pure Rust, no wasm deps."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+approx = "0.5"

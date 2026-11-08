@@ -1,0 +1,15 @@
+node_modules/
+target/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+
+# Python reference notebooks
+reference/.venv/
+reference/**/__pycache__/
+.ipynb_checkpoints/
+
+# Private planning docs (PRD, roadmap, feature plan): kept locally, not published
+/internal/

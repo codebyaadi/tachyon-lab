@@ -1,0 +1,3 @@
+# Enable WebAssembly SIMD128 for all wasm builds (supported by every current browser).
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "target-feature=+simd128"]

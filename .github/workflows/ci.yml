@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      # Must match the wasm-bindgen version pinned in crates/physics-wasm/Cargo.toml.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.130
+
+      # Installs Node + pnpm and runs `vp install`. Pinned to an exact release from
+      # https://github.com/voidzero-dev/setup-vp/releases.
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version: '24'
+          cache: true
+
+      # Type-aware lint needs the generated wasm package, so build it first.
+      - name: Build WebAssembly
+        run: pnpm wasm
+      - name: Lint (vp check, clippy, rustfmt)
+        run: pnpm lint
+      - name: Clippy for the wasm target
+        run: cargo clippy -p physics-wasm --target wasm32-unknown-unknown -- -D warnings
+      - name: Physics validation tests
+        run: cargo test --workspace
+      - name: Type check (svelte-check)
+        run: pnpm --filter web check
+      - name: Unit tests (Vitest)
+        run: pnpm --filter web test
+      - name: Build site
+        run: pnpm --filter web build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: apps/web/build
+
+  # Deploys main to Cloudflare Pages once you add the CLOUDFLARE_API_TOKEN and
+  # CLOUDFLARE_ACCOUNT_ID secrets and set the CLOUDFLARE_PROJECT repository variable.
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && vars.CLOUDFLARE_PROJECT != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: build
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy build --project-name=${{ vars.CLOUDFLARE_PROJECT }}

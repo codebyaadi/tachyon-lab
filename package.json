@@ -1,0 +1,21 @@
+{
+	"name": "tachyon-lab",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"wasm": "node scripts/build-wasm.mjs",
+		"wasm:dev": "node scripts/build-wasm.mjs --dev",
+		"dev": "pnpm wasm:dev && pnpm --filter web dev",
+		"build": "pnpm wasm && pnpm --filter web build",
+		"preview": "pnpm --filter web preview",
+		"test": "cargo test --workspace && pnpm --filter web test",
+		"check": "pnpm wasm:dev && vp check && pnpm --filter web check",
+		"lint": "vp check && cargo clippy --workspace --all-targets -- -D warnings && cargo fmt --all --check",
+		"format": "vp fmt && cargo fmt --all"
+	},
+	"devDependencies": {
+		"binaryen": "^132.0.0",
+		"vite-plus": "catalog:"
+	},
+	"packageManager": "pnpm@10.33.2"
+}
