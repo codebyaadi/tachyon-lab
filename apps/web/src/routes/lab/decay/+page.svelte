@@ -4,6 +4,7 @@
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import type { PageProps } from './$types';
@@ -25,7 +26,7 @@
 	});
 	const params = $derived(sim.params);
 	const readouts = $derived(sim.readouts);
-	const { ready, copied, error } = $derived(sim);
+	const { ready, copied, error, slow } = $derived(sim);
 
 	// Must mirror the worker's plot range.
 	const range = $derived<Range>({ x0: 0, x1: 8 / params.lambda, y0: -0.25 * params.y0, y1: 1.1 * params.y0 });
@@ -62,9 +63,7 @@
 	<section class="min-w-0">
 		<div bind:this={host} class="panel relative h-[min(60vh,440px)]">
 			<AxisLabels {range} xLabel="t" yLabel="y" />
-			{#if error}
-				<p class="absolute inset-0 grid place-items-center p-4 text-sm text-accent">Could not start the simulation: {error}</p>
-			{/if}
+			<SimStatus {ready} {error} {slow} />
 		</div>
 		<div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted">
 			<span class="flex items-center gap-2"><i class="inline-block h-0.5 w-5" style="background:var(--series-1)"></i>numerical ({params.method === 'rk4' ? 'RK4' : 'Euler'})</span>

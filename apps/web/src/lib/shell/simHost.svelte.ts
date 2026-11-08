@@ -42,6 +42,8 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 	let ready = $state(false);
 	let copied = $state(false);
 	let error = $state('');
+	/** True when starting has taken a while, so the page can say so. */
+	let slow = $state(false);
 	let api: Comlink.Remote<SimWorkerApi> | undefined;
 
 	const snapshot = () => $state.snapshot(params) as P;
@@ -54,6 +56,7 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 
 	onMount(() => {
 		let disposed = false;
+		const slowTimer = setTimeout(() => (slow = true), 6000);
 		const worker = opts.worker();
 		const canvas = document.createElement('canvas');
 		canvas.className = 'block h-full w-full rounded-lg';
@@ -91,9 +94,11 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 			try {
 				await remote.init(Comlink.transfer(offscreen, [offscreen]), shared, snapshot(), cssColors());
 			} catch (e) {
+				clearTimeout(slowTimer);
 				error = e instanceof Error ? e.message : String(e);
 				return;
 			}
+			clearTimeout(slowTimer);
 			if (disposed) return;
 			api = remote;
 			ready = true;
@@ -110,6 +115,7 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 
 		return () => {
 			disposed = true;
+			clearTimeout(slowTimer);
 			clearInterval(poll);
 			clearTimeout(hashTimer);
 			ro.disconnect();
@@ -135,6 +141,9 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 		},
 		get error() {
 			return error;
+		},
+		get slow() {
+			return slow;
 		},
 		/** A slider or select changed. */
 		onParam(key: string, value: number | string) {

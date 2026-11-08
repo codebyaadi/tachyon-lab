@@ -11,6 +11,7 @@
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import type { PageProps } from './$types';
@@ -33,7 +34,7 @@
 	});
 	const params = $derived(sim.params);
 	const readouts = $derived(sim.readouts);
-	const { ready, copied, error } = $derived(sim);
+	const { ready, copied, error, slow } = $derived(sim);
 
 	// The worker picks the axis ranges for the chosen plot and publishes them.
 	const range = $derived<Range>(
@@ -101,11 +102,7 @@
 	<section class="min-w-0">
 		<div bind:this={host} class="panel relative h-[min(62vh,460px)]">
 			<AxisLabels {range} xLabel={phase ? 'x (m)' : 't (s)'} yLabel={phase ? 'v (m/s)' : 'x (m)'} />
-			{#if error}
-				<p class="absolute inset-0 grid place-items-center p-4 text-sm text-accent">
-					Could not start the simulation: {error}
-				</p>
-			{/if}
+			<SimStatus {ready} {error} {slow} />
 		</div>
 		<div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted">
 			<span class="flex items-center gap-1.5"
