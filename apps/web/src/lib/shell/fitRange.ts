@@ -26,3 +26,19 @@ export function fitEqualAspect(xMax: number, yMax: number, width: number, height
 	const y0 = -GROUND * spanY;
 	return { x0, x1: x0 + spanX, y0, y1: y0 + spanY };
 }
+
+/**
+ * Axis ranges centred on the origin with the same data units per pixel on both axes, so a
+ * circular orbit looks circular. Shows at least `halfX` either side of the origin horizontally
+ * and `halfY` vertically, with a little headroom.
+ */
+export function fitCentered(halfX: number, halfY: number, width: number, height: number): Range {
+	const { w, h } = plotArea(width, height);
+	const HEADROOM = 1.1;
+	const needX = Math.max(halfX, 1e-9) * HEADROOM;
+	const needY = Math.max(halfY, 1e-9) * HEADROOM;
+	const unitsPerPx = Math.max(needX / (w / 2), needY / (h / 2));
+	const spanX = unitsPerPx * w;
+	const spanY = unitsPerPx * h;
+	return { x0: -spanX / 2, x1: spanX / 2, y0: -spanY / 2, y1: spanY / 2 };
+}

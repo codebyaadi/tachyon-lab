@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { fitEqualAspect, plotArea } from './fitRange';
+import { fitCentered, fitEqualAspect, plotArea } from './fitRange';
 
 const unitsPerPx = (r: { x0: number; x1: number; y0: number; y1: number }, w: number, h: number) => {
 	const a = plotArea(w, h);
@@ -52,5 +52,39 @@ describe('fitEqualAspect', () => {
 		const ua = unitsPerPx(a, 500, 300);
 		const ub = unitsPerPx(b, 1000, 600);
 		expect(ub.x / ua.x).toBeCloseTo(ub.y / ua.y, 9);
+	});
+});
+
+describe('fitCentered', () => {
+	it('is centred on the origin with equal units per pixel on both axes', () => {
+		for (const [w, h] of [
+			[800, 400],
+			[400, 800],
+			[640, 640]
+		]) {
+			const r = fitCentered(3, 2, w, h);
+			const u = unitsPerPx(r, w, h);
+			expect(u.x).toBeCloseTo(u.y, 12);
+			expect(r.x0).toBeCloseTo(-r.x1, 12);
+			expect(r.y0).toBeCloseTo(-r.y1, 12);
+		}
+	});
+
+	it('always contains the requested extent', () => {
+		for (const [hx, hy, w, h] of [
+			[49, 3, 900, 400],
+			[1, 40, 900, 400],
+			[5, 5, 300, 300]
+		]) {
+			const r = fitCentered(hx, hy, w, h);
+			expect(r.x1).toBeGreaterThanOrEqual(hx);
+			expect(r.y1).toBeGreaterThanOrEqual(hy);
+		}
+	});
+
+	it('survives empty extents and tiny canvases', () => {
+		for (const r of [fitCentered(0, 0, 800, 400), fitCentered(2, 2, 1, 1)]) {
+			for (const v of Object.values(r)) expect(Number.isFinite(v)).toBe(true);
+		}
 	});
 });

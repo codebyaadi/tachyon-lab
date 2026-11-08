@@ -110,7 +110,8 @@ const api = {
 			bg: hexToRgba(c.bg),
 			grid: hexToRgba(c.grid),
 			numeric: hexToRgba(c.numeric),
-			exact: hexToRgba(c.exact, 0.9)
+			exact: hexToRgba(c.exact, 0.9),
+			ink: hexToRgba(c.ink)
 		};
 		dirty = true;
 	},

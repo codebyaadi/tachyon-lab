@@ -27,6 +27,14 @@
 		</a>
 	</li>
 	<li>
+		<a href="/lab/orbit" class="panel block p-4 hover:border-line-strong">
+			<div class="font-medium">Orbits and Kepler's laws</div>
+			<p class="mt-1 text-sm text-muted">
+				Launch a planet around a star and compare four integrators with the exact ellipse. See which ones conserve energy and angular momentum.
+			</p>
+		</a>
+	</li>
+	<li>
 		<a href="/lab/decay" class="panel block p-4 hover:border-line-strong">
 			<div class="font-medium">Exponential decay</div>
 			<p class="mt-1 text-sm text-muted">Euler vs RK4 against the exact solution. Watch an integrator go unstable.</p>

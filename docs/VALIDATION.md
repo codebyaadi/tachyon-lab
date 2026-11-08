@@ -25,7 +25,13 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Oscillators & phase space    | Closed form  | Steady amplitude at resonance equals F / (2ζω₀²)                   | rel. error < 1e-3                                      | ✅     |
 | Oscillators & phase space    | Euler        | Energy ratio after n steps equals (1 + (ω₀dt)²)ⁿ in the lab sim    | rel. error < 1e-9                                      | ✅     |
 | Oscillators & phase space    | Semi-implicit Euler | Energy stays bounded on the lab sim                         | within 20% of start (dt = 0.05)                        | ✅     |
-| Orbits & central forces      | Verlet       | Kepler period vs T² ∝ a³                                           | rel. error < 1e-5                                      | 🔜     |
+| Orbits & central forces      | Closed form  | Kepler's equation solved to round-off (e up to 0.99)               | residual < 1e-12                                       | ✅     |
+| Orbits & central forces      | Closed form  | Exact orbit conserves E and L and returns to the start each period | abs. error < 1e-9                                      | ✅     |
+| Orbits & central forces      | RK4          | Orbit vs the exact Kepler solution over two periods (dt = 2e-4)    | position error < 1e-6                                  | ✅     |
+| Orbits & central forces      | RK4          | Kepler period vs T² ∝ a³ (five orbits, several μ)                  | rel. error < 1e-5                                      | ✅     |
+| Orbits & central forces      | Verlet       | Angular momentum over 4·10⁵ steps; energy error stays bounded     | |ΔL/L| < 1e-10; |ΔE/E| < 5e-3                       | ✅     |
+| Orbits & central forces      | Euler        | Energy and angular momentum grow, so the orbit spirals outward     | qualitative (asserted in tests)                        | ✅     |
+| Orbits & central forces      | Semi-implicit Euler | A circular orbit stays circular over 2·10⁵ steps            | radius within 1% of start                              | ✅     |
 | Coupled oscillators          | Eigen        | Normal-mode frequencies of N masses vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                     | 🔜     |
 | 1D wavefunction              | Split-step   | Norm after 10⁴ steps                                               | \|1 − ‖ψ‖²\| < 1e-10                                   | 🔜     |
 | 1D wavefunction              | Split-step   | Free Gaussian width σ(t) vs the analytic spreading                 | rel. error < 1e-4                                      | 🔜     |
@@ -37,7 +43,7 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under decoherence       | trace error < 1e-12; eigenvalues ≥ −1e-12              | 🔜     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 
