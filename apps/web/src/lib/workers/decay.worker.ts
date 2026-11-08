@@ -10,7 +10,7 @@ import { type DecayParams, R, READOUT_LEN } from '../modules/decay/params';
 import init, { DecaySim, type InitOutput } from '../wasm/pkg/physics_wasm.js';
 import wasmUrl from '../wasm/pkg/physics_wasm_bg.wasm?url';
 
-export type Colors = { bg: string; grid: string; numeric: string; exact: string };
+import type { PlotColors as Colors } from '../shell/plotColors';
 
 /** Target wall-clock duration of one full run, in seconds. */
 const RUN_SECONDS = 4;
@@ -110,7 +110,10 @@ const api = {
 			bg: hexToRgba(c.bg),
 			grid: hexToRgba(c.grid),
 			numeric: hexToRgba(c.numeric),
-			exact: hexToRgba(c.exact, 0.9)
+			exact: hexToRgba(c.exact, 0.9),
+			ink: hexToRgba(c.ink),
+			s3: hexToRgba(c.s3),
+			s4: hexToRgba(c.s4)
 		};
 		dirty = true;
 	},

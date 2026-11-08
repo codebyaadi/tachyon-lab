@@ -16,6 +16,8 @@
 	--hot: #c62828;
 	--series-1: #0072b2; /* numerical (Okabe–Ito blue) */
 	--series-2: #d55e00; /* analytic (Okabe–Ito vermillion) */
+	--series-3: #009e73;
+	--series-4: #cc79a7;
 	color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -30,6 +32,8 @@
 		--hot: #f87171;
 		--series-1: #56b4e9;
 		--series-2: #f0b84a;
+		--series-3: #5fd3a0;
+		--series-4: #e9a6d4;
 		color-scheme: dark;
 	}
 }
@@ -44,6 +48,8 @@
 	--hot: #f87171;
 	--series-1: #56b4e9;
 	--series-2: #f0b84a;
+	--series-3: #5fd3a0;
+	--series-4: #e9a6d4;
 	color-scheme: dark;
 }
 

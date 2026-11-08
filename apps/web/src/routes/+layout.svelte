@@ -17,7 +17,7 @@
 	<nav class="mx-auto flex max-w-5xl items-center gap-5 px-4 py-3">
 		<a href="/" class="text-lg font-semibold tracking-tight">Tachyon Lab</a>
 		<a href="/learn" class="text-sm text-muted hover:text-ink">Learn</a>
-		<a href="/lab/decay" class="text-sm text-muted hover:text-ink">Lab</a>
+		<a href="/lab" class="text-sm text-muted hover:text-ink">Lab</a>
 		<span class="ml-auto"><ThemeToggle /></span>
 	</nav>
 </header>

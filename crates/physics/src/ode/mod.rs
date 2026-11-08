@@ -10,7 +10,7 @@ mod verlet;
 
 pub use euler::Euler;
 pub use rk4::Rk4;
-pub use semi_implicit::semi_implicit_euler_step;
+pub use semi_implicit::{SemiImplicitEuler, semi_implicit_euler_step};
 pub use verlet::velocity_verlet_step;
 
 /// A first-order ODE system dy/dt = f(t, y).

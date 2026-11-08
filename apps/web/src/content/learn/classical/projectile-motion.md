@@ -4,6 +4,7 @@ summary: A thrown ball is two simple motions at once, steady sideways drift and 
 level: beginner
 minutes: 10
 prerequisites: [classical/describing-motion]
+sim: /lab/projectile
 status: draft
 predict:
   type: choice
@@ -83,6 +84,12 @@ $$R = \frac{v_0^2 \sin 2\theta}{g}$$
 
 The range is largest when $\sin 2\theta = 1$, that is at $\theta = 45^\circ$.
 
+**The shape of the path.** Solve $x = v_{x0}t$ for $t$ and put it into the equation for $y$ to remove time:
+
+$$y = x\tan\theta - \frac{g\,x^2}{2v_0^2\cos^2\theta}$$
+
+This is a straight line, $x\tan\theta$, pulled down by a term that grows as $x^2$. That is the equation of a **parabola**. It is symmetric: the top is exactly halfway along the range, at $x = R/2$, and on level ground the ball comes down at the same angle and the same speed it went up with.
+
 <details>
 <summary>Why does θ and 90° − θ give the same range?</summary>
 
@@ -128,4 +135,4 @@ Check with the formula: $R = 15^2 \sin 80^\circ / 9.81 = 225 \times 0.9848 / 9.8
 
 ## Where this shows up in the lab
 
-There is no projectile simulation yet. The planned Motion and Integrators lab will launch a projectile with and without air drag, compare it with exactly these formulas, and ask you to predict the landing point first. Continue with **Newton's laws** once it is written.
+Open the projectile lab and try the worked example: speed 20 m/s, angle 30°, no drag. Before you press Launch, type your predicted landing distance (35.3 m) in the Predict box, then compare. Next, turn on a little air drag and watch the ball fall short, and switch the integrator to Euler with a large time step to see a numerical method land in the wrong place. Continue with **Newton's laws** once it is written.

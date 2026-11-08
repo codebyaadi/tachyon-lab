@@ -1,30 +1,32 @@
 <script lang="ts">
-	import * as Comlink from 'comlink';
 	import 'katex/dist/katex.min.css';
-	import { onMount } from 'svelte';
+	import { DEFAULTS, type DecayParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/decay/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
+	import { fmt } from '#lib/shell/format.ts';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
-	import { parseParams } from '#lib/shell/params.ts';
+	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
-	import { decodeState, encodeState } from '#lib/shell/urlState.ts';
-	import { type DecayParams, DEFAULTS, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/decay/params.ts';
-	import type { Colors, DecayApi } from '#lib/workers/decay.worker.ts';
+	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	let params = $state<DecayParams>({ ...DEFAULTS });
-	let readouts = $state<Float64Array<ArrayBufferLike>>(new Float64Array(READOUT_LEN));
 	let mode = $state<'learn' | 'inspect'>('learn');
 	let prediction = $state('');
-	let copied = $state(false);
-	let error = $state('');
-
 	let host: HTMLDivElement;
-	// Plain variable on purpose: a Comlink proxy must not go into $state (Svelte would probe it,
-	// and every probe becomes a call to the worker). `ready` drives the UI instead.
-	let api: Comlink.Remote<DecayApi> | undefined;
-	let ready = $state(false);
+
+	const sim = createSimHost<DecayParams>({
+		worker: () => new Worker(new URL('../../../lib/workers/decay.worker.ts', import.meta.url), { type: 'module' }),
+		host: () => host,
+		specs: SPECS,
+		defaults: DEFAULTS,
+		version: VERSION,
+		readoutLen: READOUT_LEN,
+		label: 'Plot of numerical and exact solutions y(t)'
+	});
+	const params = $derived(sim.params);
+	const readouts = $derived(sim.readouts);
+	const { ready, copied, error, slow } = $derived(sim);
 
 	// Must mirror the worker's plot range.
 	const range = $derived<Range>({ x0: 0, x1: 8 / params.lambda, y0: -0.25 * params.y0, y1: 1.1 * params.y0 });
@@ -34,98 +36,6 @@
 
 	// Equation HTML is rendered at build time in +page.server.ts.
 	const eq = $derived(data.eq);
-
-	function cssColors(): Colors {
-		const cs = getComputedStyle(document.documentElement);
-		const get = (n: string) => cs.getPropertyValue(n).trim();
-		return { bg: get('--panel'), grid: get('--line'), numeric: get('--series-1'), exact: get('--series-2') };
-	}
-
-	let hashTimer: ReturnType<typeof setTimeout>;
-	function syncHash() {
-		clearTimeout(hashTimer);
-		hashTimer = setTimeout(async () => {
-			const hash = await encodeState({ v: VERSION, p: $state.snapshot(params) });
-			history.replaceState(history.state, '', `#${hash}`);
-		}, 150);
-	}
-
-	function onParam(key: string, value: number | string) {
-		params = { ...params, [key]: value };
-		api?.setParams($state.snapshot(params));
-		syncHash();
-	}
-
-	async function copyLink() {
-		clearTimeout(hashTimer);
-		const hash = await encodeState({ v: VERSION, p: $state.snapshot(params) });
-		history.replaceState(history.state, '', `#${hash}`);
-		await navigator.clipboard.writeText(location.href);
-		copied = true;
-		setTimeout(() => (copied = false), 1500);
-	}
-
-	function fmt(x: number, digits = 4): string {
-		if (!Number.isFinite(x)) return '—';
-		return Math.abs(x) !== 0 && (Math.abs(x) < 1e-3 || Math.abs(x) >= 1e5) ? x.toExponential(2) : x.toFixed(digits);
-	}
-
-	onMount(() => {
-		let disposed = false;
-		const worker = new Worker(new URL('../../../lib/workers/decay.worker.ts', import.meta.url), { type: 'module' });
-		const canvas = document.createElement('canvas');
-		canvas.className = 'block h-full w-full rounded-lg';
-		canvas.setAttribute('role', 'img');
-		canvas.setAttribute('aria-label', 'Plot of numerical and exact solutions y(t)');
-		host.prepend(canvas);
-
-		// Zero-copy readouts when cross-origin isolated; otherwise poll the worker.
-		const shared = crossOriginIsolated ? new SharedArrayBuffer(READOUT_LEN * 8) : null;
-		const sharedView = shared ? new Float64Array(shared) : null;
-
-		const remote = Comlink.wrap<DecayApi>(worker);
-		const resize = () => {
-			const r = canvas.getBoundingClientRect();
-			const dpr = devicePixelRatio || 1;
-			remote.resize(r.width * dpr, r.height * dpr, dpr);
-		};
-		const ro = new ResizeObserver(resize);
-		const scheme = matchMedia('(prefers-color-scheme: dark)');
-		const onScheme = () => remote.setColors(cssColors());
-
-		let poll: ReturnType<typeof setInterval>;
-		(async () => {
-			const state = await decodeState(location.hash);
-			if (state?.v === VERSION) params = parseParams(state.p, SPECS, DEFAULTS);
-			const offscreen = canvas.transferControlToOffscreen();
-			try {
-				await remote.init(Comlink.transfer(offscreen, [offscreen]), shared, $state.snapshot(params), cssColors());
-			} catch (e) {
-				error = e instanceof Error ? e.message : String(e);
-				return;
-			}
-			if (disposed) return;
-			api = remote;
-			ready = true;
-			resize();
-			ro.observe(canvas);
-			scheme.addEventListener('change', onScheme);
-			window.addEventListener('themechange', onScheme);
-			// UI readouts refresh at ~10 Hz; the plot itself runs at display rate in the worker.
-			poll = setInterval(async () => {
-				readouts = sharedView ? sharedView.slice() : await remote.getReadouts();
-			}, 100);
-		})();
-
-		return () => {
-			disposed = true;
-			clearInterval(poll);
-			ro.disconnect();
-			scheme.removeEventListener('change', onScheme);
-			window.removeEventListener('themechange', onScheme);
-			worker.terminate();
-		};
-	});
 </script>
 
 <svelte:head>
@@ -153,9 +63,7 @@
 	<section class="min-w-0">
 		<div bind:this={host} class="panel relative h-[min(60vh,440px)]">
 			<AxisLabels {range} xLabel="t" yLabel="y" />
-			{#if error}
-				<p class="absolute inset-0 grid place-items-center p-4 text-sm text-accent">Could not start the simulation: {error}</p>
-			{/if}
+			<SimStatus {ready} {error} {slow} />
 		</div>
 		<div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted">
 			<span class="flex items-center gap-2"><i class="inline-block h-0.5 w-5" style="background:var(--series-1)"></i>numerical ({params.method === 'rk4' ? 'RK4' : 'Euler'})</span>
@@ -163,11 +71,11 @@
 		</div>
 
 		<div class="mt-4 flex flex-wrap gap-3">
-			<button class="btn btn-primary" disabled={!ready} onclick={() => (running ? api?.pause() : api?.play())}>
+			<button class="btn btn-primary" disabled={!ready} onclick={() => (running ? sim.pause() : sim.play())}>
 				{running ? 'Pause' : finished ? 'Run again' : 'Run'}
 			</button>
-			<button class="btn" disabled={!ready} onclick={() => api?.reset()}>Reset</button>
-			<button class="btn" onclick={copyLink}>{copied ? 'Link copied' : 'Copy share link'}</button>
+			<button class="btn" disabled={!ready} onclick={() => sim.reset()}>Reset</button>
+			<button class="btn" onclick={sim.copyLink}>{copied ? 'Link copied' : 'Copy share link'}</button>
 		</div>
 
 		<dl class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4" aria-live="polite">
@@ -201,7 +109,7 @@
 	<aside class="space-y-5">
 		<div class="panel p-4">
 			<h2 class="mb-3 text-sm font-semibold">Parameters</h2>
-			<ParamPanel specs={SPECS} values={params} onchange={onParam} />
+			<ParamPanel specs={SPECS} values={params} onchange={sim.onParam} />
 		</div>
 
 		<div class="panel p-4">

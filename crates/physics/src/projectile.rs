@@ -147,3 +147,116 @@ mod tests {
         assert!(drag.energy(&run_rk4(&drag, 1e-3, 3.0)) < e0);
     }
 }
+
+#[cfg(test)]
+mod landing_tests {
+    use super::*;
+    use crate::analytic::{
+        State2, landing_time_linear_drag, landing_time_no_drag, projectile_linear_drag,
+    };
+    use crate::ode::{Integrator, Rk4, SemiImplicitEuler};
+    use approx::assert_relative_eq;
+
+    const G: f64 = 9.81;
+    const LAUNCH: State2 = State2 {
+        x: 0.0,
+        y: 2.0,
+        vx: 30.0,
+        vy: 40.0,
+    };
+
+    #[test]
+    fn linear_drag_landing_time_reduces_to_no_drag() {
+        let t = landing_time_linear_drag(LAUNCH, G, 0.0);
+        assert_relative_eq!(t, landing_time_no_drag(2.0, 40.0, G), epsilon = 1e-12);
+    }
+
+    #[test]
+    fn linear_drag_landing_time_is_a_root_of_the_height() {
+        for k in [0.01, 0.3, 2.0] {
+            let t = landing_time_linear_drag(LAUNCH, G, k);
+            assert!(
+                projectile_linear_drag(LAUNCH, G, k, t).y.abs() < 1e-9,
+                "k = {k}"
+            );
+        }
+        // Worked value used in the lab notebook: k = 0.3 lands after about 6.38 s, 85.2 m away.
+        let t = landing_time_linear_drag(LAUNCH, G, 0.3);
+        assert_relative_eq!(t, 6.3784, max_relative = 1e-4);
+        assert_relative_eq!(
+            projectile_linear_drag(LAUNCH, G, 0.3, t).x,
+            85.24,
+            max_relative = 1e-3
+        );
+    }
+
+    #[test]
+    fn linear_drag_landing_handles_a_drop_from_rest() {
+        // Released horizontally from 100 m: drag makes the fall take longer than √(2h/g).
+        let s0 = State2 {
+            x: 0.0,
+            y: 100.0,
+            vx: 10.0,
+            vy: 0.0,
+        };
+        let free = landing_time_no_drag(100.0, 0.0, G);
+        assert!(landing_time_linear_drag(s0, G, 0.5) > free);
+        // Already on the ground and moving down: lands immediately.
+        let ground = State2 {
+            x: 0.0,
+            y: 0.0,
+            vx: 1.0,
+            vy: -1.0,
+        };
+        assert_eq!(landing_time_linear_drag(ground, G, 0.5), 0.0);
+    }
+
+    #[test]
+    fn rk4_landing_agrees_with_the_closed_form_for_linear_drag() {
+        let (k, dt) = (0.3, 1e-3);
+        let sys = Projectile {
+            g: G,
+            linear: k,
+            quadratic: 0.0,
+        };
+        let mut y = [LAUNCH.x, LAUNCH.y, LAUNCH.vx, LAUNCH.vy];
+        let mut rk4 = Rk4::new(4);
+        let mut t = 0.0;
+        loop {
+            let prev = y;
+            rk4.step(&sys, t, &mut y, dt);
+            if y[Y] < 0.0 {
+                // linear interpolation to y = 0
+                let f = prev[Y] / (prev[Y] - y[Y]);
+                t += f * dt;
+                break;
+            }
+            t += dt;
+        }
+        assert_relative_eq!(
+            t,
+            landing_time_linear_drag(LAUNCH, G, k),
+            max_relative = 1e-6
+        );
+    }
+
+    #[test]
+    fn semi_implicit_projectile_loses_the_predicted_height() {
+        // With gravity only, semi-implicit Euler's height is low by exactly ½·g·t·dt
+        // (docs/notebook/01), so it lands early. Check the height error at t = 2 s.
+        let (dt, t_end): (f64, f64) = (0.01, 2.0);
+        let sys = Projectile {
+            g: G,
+            linear: 0.0,
+            quadratic: 0.0,
+        };
+        let mut y = [0.0, 0.0, 10.0, 20.0];
+        let mut integ = SemiImplicitEuler::new(4);
+        let steps = (t_end / dt).round() as usize;
+        for i in 0..steps {
+            integ.step(&sys, i as f64 * dt, &mut y, dt);
+        }
+        let exact = 20.0 * t_end - 0.5 * G * t_end * t_end;
+        assert_relative_eq!(y[Y] - exact, -0.5 * G * t_end * dt, epsilon = 1e-9);
+    }
+}

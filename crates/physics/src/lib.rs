@@ -7,5 +7,11 @@
 #![allow(clippy::needless_range_loop)]
 
 pub mod analytic;
+pub mod coupled;
+pub mod kepler;
 pub mod ode;
+pub mod oscillator;
+pub mod pendulum;
 pub mod projectile;
+pub mod qubit;
+pub mod schrodinger;

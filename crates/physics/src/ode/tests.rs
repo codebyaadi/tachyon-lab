@@ -130,3 +130,41 @@ fn semi_implicit_euler_is_first_order() {
     // Halving dt should halve the error.
     assert_relative_eq!(error_at(1e-3) / error_at(5e-4), 2.0, epsilon = 0.05);
 }
+
+#[test]
+fn semi_implicit_integrator_matches_the_slice_function() {
+    // The Integrator version must follow exactly the same path as the x'' = a(x) function.
+    let dt = 1e-2;
+    let mut y = [1.0, 0.0];
+    let mut integ = SemiImplicitEuler::new(2);
+    let (mut x, mut v, mut a) = ([1.0], [0.0], [0.0]);
+    for i in 0..1000 {
+        integ.step(&Sho, i as f64 * dt, &mut y, dt);
+        semi_implicit_euler_step(&mut x, &mut v, &mut a, dt, |x, a| a[0] = -x[0]);
+    }
+    assert_relative_eq!(y[0], x[0], epsilon = 1e-12);
+    assert_relative_eq!(y[1], v[0], epsilon = 1e-12);
+}
+
+#[test]
+fn semi_implicit_integrator_uses_velocity_dependent_forces() {
+    // Linear drag only (no gravity): v' = v − dt·k·v, then x' = x + dt·v'.
+    struct Drag {
+        k: f64,
+    }
+    impl System for Drag {
+        fn dim(&self) -> usize {
+            2
+        }
+        fn deriv(&self, _t: f64, y: &[f64], dy: &mut [f64]) {
+            dy[0] = y[1];
+            dy[1] = -self.k * y[1];
+        }
+    }
+    let (k, dt) = (0.5, 0.1);
+    let mut y = [0.0, 10.0];
+    SemiImplicitEuler::new(2).step(&Drag { k }, 0.0, &mut y, dt);
+    let v1 = 10.0 * (1.0 - dt * k);
+    assert_relative_eq!(y[1], v1, epsilon = 1e-12);
+    assert_relative_eq!(y[0], dt * v1, epsilon = 1e-12);
+}

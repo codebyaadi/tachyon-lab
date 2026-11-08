@@ -29,6 +29,7 @@
 
 <div class="space-y-4">
 	{#each specs as s (s.key)}
+		{#if s.kind !== 'text'}
 		<div>
 			{#if s.kind === 'number'}
 				{@const x = Number(values[s.key])}
@@ -61,5 +62,6 @@
 			{/if}
 			{#if s.help}<p class="mt-1 text-xs text-muted">{s.help}</p>{/if}
 		</div>
+		{/if}
 	{/each}
 </div>
