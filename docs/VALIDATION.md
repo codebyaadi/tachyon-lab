@@ -20,7 +20,11 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Projectile lab               | RK4          | Landing distance and time vs exact, no drag and linear drag (dt = 1e-3) | rel. error < 1e-6                                 | ✅     |
 | Projectile lab               | RK4          | Landing at a coarse step (dt = 0.05) with cubic-Hermite interpolation | rel. error < 1e-9                                   | ✅     |
 | Projectile lab               | RK4          | A drag-free ball lands at its launch speed (energy conserved)      | abs. error < 1e-9                                      | ✅     |
-| Oscillators & phase space    | RK4          | Damped and driven oscillator vs the analytic solution              | rel. error < 1e-6                                      | 🔜     |
+| Oscillators & phase space    | RK4          | Damped and driven oscillator vs the analytic solution (undamped, under-, critically and overdamped) | abs. error < 1e-8 (dt = 1e-3) | ✅     |
+| Oscillators & phase space    | RK4          | Undamped resonance (ω_d = ω₀) vs the closed form (x = F t sin ω₀t / 2ω₀) | abs. error < 1e-8 (dt = 1e-3)                     | ✅     |
+| Oscillators & phase space    | Closed form  | Steady amplitude at resonance equals F / (2ζω₀²)                   | rel. error < 1e-3                                      | ✅     |
+| Oscillators & phase space    | Euler        | Energy ratio after n steps equals (1 + (ω₀dt)²)ⁿ in the lab sim    | rel. error < 1e-9                                      | ✅     |
+| Oscillators & phase space    | Semi-implicit Euler | Energy stays bounded on the lab sim                         | within 20% of start (dt = 0.05)                        | ✅     |
 | Orbits & central forces      | Verlet       | Kepler period vs T² ∝ a³                                           | rel. error < 1e-5                                      | 🔜     |
 | Coupled oscillators          | Eigen        | Normal-mode frequencies of N masses vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                     | 🔜     |
 | 1D wavefunction              | Split-step   | Norm after 10⁴ steps                                               | \|1 − ‖ψ‖²\| < 1e-10                                   | 🔜     |
@@ -33,7 +37,7 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under decoherence       | trace error < 1e-12; eigenvalues ≥ −1e-12              | 🔜     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs` and `crates/physics/src/projectile.rs`. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 

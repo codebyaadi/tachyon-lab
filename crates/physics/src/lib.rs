@@ -8,4 +8,5 @@
 
 pub mod analytic;
 pub mod ode;
+pub mod oscillator;
 pub mod projectile;

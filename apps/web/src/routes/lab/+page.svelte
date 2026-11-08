@@ -19,6 +19,14 @@
 		</a>
 	</li>
 	<li>
+		<a href="/lab/oscillator" class="panel block p-4 hover:border-line-strong">
+			<div class="font-medium">Oscillators and phase space</div>
+			<p class="mt-1 text-sm text-muted">
+				A spring with damping and a driving force. See resonance, and watch Euler add energy that is not there.
+			</p>
+		</a>
+	</li>
+	<li>
 		<a href="/lab/decay" class="panel block p-4 hover:border-line-strong">
 			<div class="font-medium">Exponential decay</div>
 			<p class="mt-1 text-sm text-muted">Euler vs RK4 against the exact solution. Watch an integrator go unstable.</p>

@@ -32,7 +32,7 @@ Accuracy is a feature: every solver is tested against analytic results, and ever
 
 | | |
 |---|---|
-| **Works today** | **Projectile lab**: launch with or without air drag, predict the landing point, and compare Euler, semi-implicit Euler and RK4 with the exact answer · exponential-decay lab · Rust physics core (Euler, semi-implicit Euler, RK4, velocity Verlet, 2D projectile with linear and quadratic drag, analytic solutions) · WebGL2 plotting in a worker · URL-shareable state · light and dark themes · the Learn pipeline and `/learn` pages |
+| **Works today** | **Projectile lab**: launch with or without air drag, predict the landing point, and compare Euler, semi-implicit Euler and RK4 with the exact answer · **Oscillator lab**: a damped, driven spring in time and in phase space, with resonance and the energy an integrator adds or loses · exponential-decay lab · Rust physics core (Euler, semi-implicit Euler, RK4, velocity Verlet, 2D projectile with linear and quadratic drag, damped driven oscillator, analytic solutions) · WebGL2 plotting in a worker · URL-shareable state · light and dark themes · the Learn pipeline and `/learn` pages |
 | **Written** | 2 of 88 lessons (`describing-motion`, `projectile-motion`), both marked _draft_ until the author has reviewed them |
 | **Next** | The shared module shell (the two labs still duplicate some page code), sketch-your-prediction, misconception presets, and an energy-versus-time plot comparing integrators |
 
