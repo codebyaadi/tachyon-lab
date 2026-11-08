@@ -30,6 +30,13 @@ export const LABS: LabInfo[] = [
 		lessons: []
 	},
 	{
+		href: '/lab/coupled',
+		title: 'Coupled oscillators',
+		blurb:
+			'Masses joined by springs. Watch energy travel along the chain, then find the normal modes that make it simple.',
+		lessons: []
+	},
+	{
 		href: '/lab/orbit',
 		title: "Orbits and Kepler's laws",
 		blurb:

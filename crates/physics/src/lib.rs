@@ -7,6 +7,7 @@
 #![allow(clippy::needless_range_loop)]
 
 pub mod analytic;
+pub mod coupled;
 pub mod kepler;
 pub mod ode;
 pub mod oscillator;

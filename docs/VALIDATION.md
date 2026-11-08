@@ -37,7 +37,10 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Orbits & central forces      | Verlet       | Angular momentum over 4·10⁵ steps; energy error stays bounded     | |ΔL/L| < 1e-10; |ΔE/E| < 5e-3                       | ✅     |
 | Orbits & central forces      | Euler        | Energy and angular momentum grow, so the orbit spirals outward     | qualitative (asserted in tests)                        | ✅     |
 | Orbits & central forces      | Semi-implicit Euler | A circular orbit stays circular over 2·10⁵ steps            | radius within 1% of start                              | ✅     |
-| Coupled oscillators          | Eigen        | Normal-mode frequencies of N masses vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                     | 🔜     |
+| Coupled oscillators          | Eigen        | Jacobi eigenvalues of N masses (N ≤ 12) vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                  | ✅     |
+| Coupled oscillators          | Closed form  | Mode shapes are orthogonal; a single mode is a standing wave at its own frequency | abs. error < 1e-12                           | ✅     |
+| Coupled oscillators          | RK4          | Five masses with one plucked vs the exact normal-mode sum (dt = 1e-3) | abs. error < 1e-8                                 | ✅     |
+| Coupled oscillators          | Verlet, Euler | Energy of the chain: bounded under Verlet, grows under Euler      | |ΔE/E| < 1e-3 (Verlet); > 200% (Euler)               | ✅     |
 | 1D wavefunction              | Split-step   | Norm after 10⁴ steps                                               | \|1 − ‖ψ‖²\| < 1e-10                                   | 🔜     |
 | 1D wavefunction              | Split-step   | Free Gaussian width σ(t) vs the analytic spreading                 | rel. error < 1e-4                                      | 🔜     |
 | 1D wavefunction              | Split-step   | Coherent state in a harmonic well: ⟨x⟩(t) vs x₀ cos(ωt)            | abs. error < 1e-3 (N = 1024)                           | 🔜     |
@@ -48,7 +51,7 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under decoherence       | trace error < 1e-12; eigenvalues ≥ −1e-12              | 🔜     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs`, `crates/physics/src/coupled.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 
