@@ -5,9 +5,11 @@
 mod decay;
 mod orbit;
 mod oscillator;
+mod pendulum;
 mod projectile;
 
 pub use decay::DecaySim;
 pub use orbit::OrbitSim;
 pub use oscillator::OscillatorSim;
+pub use pendulum::PendulumSim;
 pub use projectile::ProjectileSim;

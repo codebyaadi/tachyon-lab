@@ -25,6 +25,11 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Oscillators & phase space    | Closed form  | Steady amplitude at resonance equals F / (2ζω₀²)                   | rel. error < 1e-3                                      | ✅     |
 | Oscillators & phase space    | Euler        | Energy ratio after n steps equals (1 + (ω₀dt)²)ⁿ in the lab sim    | rel. error < 1e-9                                      | ✅     |
 | Oscillators & phase space    | Semi-implicit Euler | Energy stays bounded on the lab sim                         | within 20% of start (dt = 0.05)                        | ✅     |
+| Pendulum                     | Closed form  | Elliptic integral K(m) and Jacobi sn, cn, dn vs known values and identities | abs. error < 1e-12                          | ✅     |
+| Pendulum                     | RK4          | Nonlinear pendulum vs the exact elliptic-function solution (θ₀ up to 172°) | abs. error < 1e-7                            | ✅     |
+| Pendulum                     | Closed form  | Period grows with amplitude: 1.1803 × the small-angle value at 90°  | rel. error < 1e-9                                      | ✅     |
+| Pendulum                     | RK4          | The lab's fine-RK4 reference vs the exact solution (20°, 90°, 150°) | abs. error < 1e-8                                     | ✅     |
+| Pendulum                     | Euler        | Energy grows, so the swing grows by itself                         | qualitative (asserted in tests)                        | ✅     |
 | Orbits & central forces      | Closed form  | Kepler's equation solved to round-off (e up to 0.99)               | residual < 1e-12                                       | ✅     |
 | Orbits & central forces      | Closed form  | Exact orbit conserves E and L and returns to the start each period | abs. error < 1e-9                                      | ✅     |
 | Orbits & central forces      | RK4          | Orbit vs the exact Kepler solution over two periods (dt = 2e-4)    | position error < 1e-6                                  | ✅     |
@@ -43,7 +48,7 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under decoherence       | trace error < 1e-12; eigenvalues ≥ −1e-12              | 🔜     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 

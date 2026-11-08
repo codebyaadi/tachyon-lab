@@ -24,6 +24,12 @@ export const LABS: LabInfo[] = [
 		]
 	},
 	{
+		href: '/lab/pendulum',
+		title: 'The pendulum',
+		blurb: 'Why big swings are slower, where swinging turns into spinning, and how phase space shows the boundary.',
+		lessons: []
+	},
+	{
 		href: '/lab/orbit',
 		title: "Orbits and Kepler's laws",
 		blurb:
