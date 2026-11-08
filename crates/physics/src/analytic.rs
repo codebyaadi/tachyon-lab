@@ -59,3 +59,39 @@ pub fn landing_time_no_drag(y0: f64, vy0: f64, g: f64) -> f64 {
 pub fn terminal_speed_quadratic(g: f64, c: f64) -> f64 {
     (g / c).sqrt()
 }
+
+/// Time at which a projectile with linear drag (a = −k·v) returns to y = 0, found by
+/// bisection on the closed-form height (there is no elementary formula; it needs the Lambert W
+/// function). Assumes the launch height is ≥ 0. Returns 0 if it starts on the ground moving down.
+pub fn landing_time_linear_drag(s0: State2, g: f64, k: f64) -> f64 {
+    if k < 1e-9 {
+        return landing_time_no_drag(s0.y, s0.vy, g);
+    }
+    if s0.y <= 0.0 && s0.vy <= 0.0 {
+        return 0.0;
+    }
+    let height = |t: f64| projectile_linear_drag(s0, g, k, t).y;
+    // The highest point is where vy = 0; after it, y only decreases.
+    let t_apex = if s0.vy > 0.0 {
+        (1.0 + k * s0.vy / g).ln() / k
+    } else {
+        0.0
+    };
+    let mut hi = t_apex + 1.0;
+    for _ in 0..200 {
+        if height(hi) <= 0.0 {
+            break;
+        }
+        hi *= 2.0;
+    }
+    let mut lo = t_apex;
+    for _ in 0..200 {
+        let mid = 0.5 * (lo + hi);
+        if height(mid) > 0.0 {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    0.5 * (lo + hi)
+}

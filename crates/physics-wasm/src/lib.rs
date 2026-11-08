@@ -3,5 +3,7 @@
 //! WebAssembly memory (`*_ptr` + `len`), so nothing is copied per frame.
 
 mod decay;
+mod projectile;
 
 pub use decay::DecaySim;
+pub use projectile::ProjectileSim;

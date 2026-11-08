@@ -32,9 +32,9 @@ Accuracy is a feature: every solver is tested against analytic results, and ever
 
 | | |
 |---|---|
-| **Works today** | Exponential-decay lab (Euler vs RK4 against the exact solution) · Rust physics core with Euler, semi-implicit Euler, RK4 and velocity Verlet, plus a 2D projectile with linear and quadratic drag and its analytic solutions · WebGL2 plotting in a worker · URL-shareable state · light and dark themes · the Learn pipeline and `/learn` pages |
+| **Works today** | **Projectile lab**: launch with or without air drag, predict the landing point, and compare Euler, semi-implicit Euler and RK4 with the exact answer · exponential-decay lab · Rust physics core (Euler, semi-implicit Euler, RK4, velocity Verlet, 2D projectile with linear and quadratic drag, analytic solutions) · WebGL2 plotting in a worker · URL-shareable state · light and dark themes · the Learn pipeline and `/learn` pages |
 | **Written** | 2 of 88 lessons (`describing-motion`, `projectile-motion`), both marked _draft_ until the author has reviewed them |
-| **Next** | The projectile simulation (the Rust core is ready; the browser layer and UI are not), then the shared module shell, sketch-your-prediction, and misconception presets |
+| **Next** | The shared module shell (the two labs still duplicate some page code), sketch-your-prediction, misconception presets, and an energy-versus-time plot comparing integrators |
 
 Lessons carry a visible **draft / reviewed** label because physics errors destroy trust. A lesson is only marked reviewed after its key steps have been derived by hand.
 

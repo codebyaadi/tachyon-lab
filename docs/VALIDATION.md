@@ -15,6 +15,11 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Motion & integrators         | Verlet       | Energy of a harmonic oscillator, 10⁶ steps                         | bounded, no secular drift; \|ΔE/E\| < 1e-4             | ✅     |
 | Motion & integrators         | Semi-implicit Euler | Energy of a harmonic oscillator, 10⁶ steps                  | bounded; \|ΔE/E\| < 2·dt                               | ✅     |
 | Motion & integrators         | Euler        | Energy of a harmonic oscillator grows exactly as (1 + dt²)ⁿ        | rel. error < 1e-9                                      | ✅     |
+| Motion & integrators         | Euler, semi-implicit | With gravity only, height errs by ±½·g·t·dt (Euler high, semi-implicit low) | abs. error < 1e-9                       | ✅     |
+| Motion & integrators         | Closed form  | Linear-drag landing time vs RK4 (dt = 1e-3) and as a root of the height | rel. error < 1e-6                                 | ✅     |
+| Projectile lab               | RK4          | Landing distance and time vs exact, no drag and linear drag (dt = 1e-3) | rel. error < 1e-6                                 | ✅     |
+| Projectile lab               | RK4          | Landing at a coarse step (dt = 0.05) with cubic-Hermite interpolation | rel. error < 1e-9                                   | ✅     |
+| Projectile lab               | RK4          | A drag-free ball lands at its launch speed (energy conserved)      | abs. error < 1e-9                                      | ✅     |
 | Oscillators & phase space    | RK4          | Damped and driven oscillator vs the analytic solution              | rel. error < 1e-6                                      | 🔜     |
 | Orbits & central forces      | Verlet       | Kepler period vs T² ∝ a³                                           | rel. error < 1e-5                                      | 🔜     |
 | Coupled oscillators          | Eigen        | Normal-mode frequencies of N masses vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                     | 🔜     |

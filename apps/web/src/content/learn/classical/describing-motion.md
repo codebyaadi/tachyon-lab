@@ -122,4 +122,4 @@ Check: the average speed is $(6 + 12)/2 = 9\ \text{m/s}$, and $9 \times 4 = 36\ 
 
 ## Where this shows up in the lab
 
-Every simulation here moves things forward in tiny time steps, using "new value = old value + rate × time step", which is the same idea as $v = v_0 + at$ applied again and again. You can watch that in the [exponential decay lab](/lab/decay), where the numerical curve is built step by step. A projectile lab, which applies exactly these equations in two directions, is coming next. Continue with **Projectile motion**.
+Every simulation here moves things forward in tiny time steps, using "new value = old value + rate × time step", which is the same idea as $v = v_0 + at$ applied again and again. You can watch that in the [exponential decay lab](/lab/decay), where the numerical curve is built step by step. The [projectile lab](/lab/projectile) applies exactly these equations in two directions. Continue with **Projectile motion**.

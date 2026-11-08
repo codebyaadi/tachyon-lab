@@ -24,7 +24,13 @@
 			<p class="mt-1 text-sm text-muted">Euler vs RK4 against the exact solution. Watch an integrator go unstable.</p>
 		</a>
 	</li>
-	{#each [['Motion & integrators', 'Projectiles, drag, energy drift'], ['Oscillators & phase space', 'Resonance, damping, pendulum']] as [t, d] (t)}
+	<li>
+		<a href="/lab/projectile" class="panel block p-4 hover:border-line-strong">
+			<div class="font-medium">Projectile motion</div>
+			<p class="mt-1 text-sm text-muted">Launch it with or without air drag, predict the landing point, compare Euler, semi-implicit Euler and RK4.</p>
+		</a>
+	</li>
+	{#each [['Oscillators & phase space', 'Resonance, damping, pendulum']] as [t, d] (t)}
 		<li class="panel p-4 opacity-60">
 			<div class="font-medium">{t} <span class="label ml-1">coming next</span></div>
 			<p class="mt-1 text-sm text-muted">{d}</p>

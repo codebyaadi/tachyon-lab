@@ -4,6 +4,7 @@ summary: A thrown ball is two simple motions at once, steady sideways drift and 
 level: beginner
 minutes: 10
 prerequisites: [classical/describing-motion]
+sim: /lab/projectile
 status: draft
 predict:
   type: choice
@@ -128,4 +129,4 @@ Check with the formula: $R = 15^2 \sin 80^\circ / 9.81 = 225 \times 0.9848 / 9.8
 
 ## Where this shows up in the lab
 
-There is no projectile simulation yet. The planned Motion and Integrators lab will launch a projectile with and without air drag, compare it with exactly these formulas, and ask you to predict the landing point first. Continue with **Newton's laws** once it is written.
+Open the projectile lab and try the worked example: speed 20 m/s, angle 30°, no drag. Before you press Launch, type your predicted landing distance (35.3 m) in the Predict box, then compare. Next, turn on a little air drag and watch the ball fall short, and switch the integrator to Euler with a large time step to see a numerical method land in the wrong place. Continue with **Newton's laws** once it is written.

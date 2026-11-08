@@ -93,6 +93,14 @@
 		const scheme = matchMedia('(prefers-color-scheme: dark)');
 		const onScheme = () => remote.setColors(cssColors());
 
+		// A different share link pasted into this tab only changes the hash (no reload): apply it.
+		const onHash = async () => {
+			const state = await decodeState(location.hash);
+			if (state?.v !== VERSION) return;
+			params = parseParams(state.p, SPECS, DEFAULTS);
+			remote.setParams($state.snapshot(params));
+		};
+
 		let poll: ReturnType<typeof setInterval>;
 		(async () => {
 			const state = await decodeState(location.hash);
@@ -111,6 +119,7 @@
 			ro.observe(canvas);
 			scheme.addEventListener('change', onScheme);
 			window.addEventListener('themechange', onScheme);
+			window.addEventListener('hashchange', onHash);
 			// UI readouts refresh at ~10 Hz; the plot itself runs at display rate in the worker.
 			poll = setInterval(async () => {
 				readouts = sharedView ? sharedView.slice() : await remote.getReadouts();
@@ -123,6 +132,7 @@
 			ro.disconnect();
 			scheme.removeEventListener('change', onScheme);
 			window.removeEventListener('themechange', onScheme);
+			window.removeEventListener('hashchange', onHash);
 			worker.terminate();
 		};
 	});
