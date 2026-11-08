@@ -35,7 +35,7 @@ export const LABS: LabInfo[] = [
 		title: 'Coupled oscillators',
 		blurb:
 			'Masses joined by springs. Watch energy travel along the chain, then find the normal modes that make it simple.',
-		lessons: []
+		lessons: [{ href: '/learn/classical/coupled-oscillators', title: 'Coupled oscillators and normal modes' }]
 	},
 	{
 		href: '/lab/orbit',
@@ -49,13 +49,23 @@ export const LABS: LabInfo[] = [
 		title: 'Which integrator keeps energy?',
 		blurb:
 			'Euler, semi-implicit Euler, RK4 and velocity Verlet side by side. See which energy errors grow and which stay bounded.',
-		lessons: []
+		lessons: [{ href: '/learn/classical/numerical-integration', title: 'Why we simulate: from Euler to RK4' }]
 	},
 	{
 		href: '/lab/qubit',
 		title: 'The qubit and the Bloch sphere',
 		blurb: 'Turn a qubit with quantum gates, then switch on noise and watch its state decay.',
-		lessons: [{ href: '/learn/quantum/bloch-sphere', title: 'The qubit and the Bloch sphere' }]
+		lessons: [
+			{ href: '/learn/quantum/bloch-sphere', title: 'The qubit and the Bloch sphere' },
+			{ href: '/learn/quantum/density-matrix-decoherence', title: 'Density matrices and decoherence' }
+		]
+	},
+	{
+		href: '/lab/wave',
+		title: 'A wave packet on a line',
+		blurb:
+			'Release a quantum particle and watch it spread, bounce off a wall, and tunnel through a barrier it cannot climb.',
+		lessons: [{ href: '/learn/quantum/schrodinger-equation', title: 'The Schrödinger equation' }]
 	},
 	{
 		href: '/lab/decay',

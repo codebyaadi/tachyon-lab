@@ -41,11 +41,14 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Coupled oscillators          | Closed form  | Mode shapes are orthogonal; a single mode is a standing wave at its own frequency | abs. error < 1e-12                           | ✅     |
 | Coupled oscillators          | RK4          | Five masses with one plucked vs the exact normal-mode sum (dt = 1e-3) | abs. error < 1e-8                                 | ✅     |
 | Coupled oscillators          | Verlet, Euler | Energy of the chain: bounded under Verlet, grows under Euler      | |ΔE/E| < 1e-3 (Verlet); > 200% (Euler)               | ✅     |
-| 1D wavefunction              | Split-step   | Norm after 10⁴ steps                                               | \|1 − ‖ψ‖²\| < 1e-10                                   | 🔜     |
-| 1D wavefunction              | Split-step   | Free Gaussian width σ(t) vs the analytic spreading                 | rel. error < 1e-4                                      | 🔜     |
+| 1D wavefunction              | Split-step   | Norm after 400 steps through a barrier with a step four times too large | |1 − ‖ψ‖²| < 1e-12                          | ✅     |
+| 1D wavefunction              | Split-step   | Free Gaussian width σ(t) vs the analytic spreading; centre vs x₀ + k₀t | rel. error < 1e-5; abs. error < 1e-6                | ✅     |
+| 1D wavefunction              | Split-step   | The Gaussian saturates σₓσₚ = ½ at the start and exceeds it after spreading | abs. error < 1e-6                              | ✅     |
 | 1D wavefunction              | Split-step   | Coherent state in a harmonic well: ⟨x⟩(t) vs x₀ cos(ωt)            | abs. error < 1e-3 (N = 1024)                           | 🔜     |
-| 1D wavefunction              | FD eigen     | Harmonic-oscillator energies Eₙ = (n + ½)ħω, n ≤ 10                | rel. error < 1e-4                                      | 🔜     |
-| 1D wavefunction              | FD eigen     | Infinite-well energies, n ≤ 10                                     | rel. error < 1e-4                                      | 🔜     |
+| 1D wavefunction              | Imaginary time | Harmonic-oscillator energies Eₙ = (n + ½)ħω, n ≤ 3               | abs. error < 1e-5                                      | ✅     |
+| 1D wavefunction              | Imaginary time | Hard-walled box (V = 100) levels vs the exact square-well roots, n ≤ 3; the roots tend to n²π²/(2a²) as V → ∞ | rel. error < 2e-3; < 1e-3 | ✅ |
+| 1D wavefunction              | Scattering   | Transmitted share vs momentum-averaged analytic T, rectangular barrier; and a step above its energy | abs. error < 0.01·T + 0.002; < 0.01 | ✅     |
+| 1D wavefunction              | Split-step   | Ground-state ⟨E⟩ stays at ½ω and the density does not move over 2000 steps | abs. error < 1e-4; < 1e-3                        | ✅     |
 | 1D wavefunction              | Scattering   | Numerical T vs momentum-averaged analytic T, rectangular barrier   | abs. error < 0.01                                      | 🔜     |
 | Qubit & Bloch sphere         | Matrix       | Gate identities (H² = I, HZH = X, HXH = Z, S² = Z, T² = S, XY = iZ) | error < 1e-12                                       | ✅     |
 | Qubit & Bloch sphere         | Matrix       | Every gate's matrix agrees with its rotation of the Bloch sphere (up to global phase) | error < 1e-12                          | ✅     |
@@ -54,7 +57,7 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Qubit & Bloch sphere         | Kraus        | Population relaxes as e^(−t/T₁) and coherence as e^(−t/T₂), whatever the step | abs. error < 1e-12                          | ✅     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs`, `crates/physics/src/coupled.rs`, `crates/physics/src/qubit.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs`, `crates/physics/src/coupled.rs`, `crates/physics/src/qubit.rs`, `crates/physics/src/schrodinger.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 

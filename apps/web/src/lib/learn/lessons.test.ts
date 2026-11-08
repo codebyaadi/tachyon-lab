@@ -107,7 +107,17 @@ const verifiers: Record<string, () => number> = {
 	'classical/keplers-laws#q3': () => (3.0 * 2.0) / 1.0,
 	'quantum/bloch-sphere#q1': () => Math.cos(Math.PI / 6) ** 2,
 	'quantum/bloch-sphere#q2': () => (1 - 0.6) / 2,
-	'quantum/bloch-sphere#q3': () => 1 + (-1 - 1) * Math.exp(-5 / 5)
+	'quantum/bloch-sphere#q3': () => 1 + (-1 - 1) * Math.exp(-5 / 5),
+	'classical/numerical-integration#q1': () => (1 + 1 * 0.1 ** 2) ** 100,
+	'classical/numerical-integration#q2': () => 2 ** 4,
+	'classical/coupled-oscillators#q1': () => 2 * 10 * Math.sin((3 * Math.PI) / 8),
+	'classical/coupled-oscillators#q2': () => Math.PI / (3 * Math.sqrt(3) - 3),
+	'quantum/density-matrix-decoherence#q1': () => Math.exp(-2 / 4),
+	'quantum/density-matrix-decoherence#q2': () => 5 * Math.LN2,
+	'quantum/density-matrix-decoherence#q3': () => 0.5 * (1 + Math.exp(-2 / 4) ** 2),
+	'quantum/schrodinger-equation#q1': () => 1 * Math.sqrt(1 + (4 / (2 * 1 ** 2)) ** 2),
+	'quantum/schrodinger-equation#q2': () => -40 + 1.5 * 30,
+	'quantum/schrodinger-equation#q3': () => 1 / (2 * 2)
 };
 
 /** Complete elliptic integral of the first kind, by the arithmetic-geometric mean. */
@@ -332,6 +342,147 @@ describe('numbers in lessons are verified', () => {
 		const ph = 1.9;
 		const v = [Math.sin(th) * Math.cos(ph), Math.sin(th) * Math.sin(ph), Math.cos(th)];
 		expect(Math.hypot(...v)).toBeCloseTo(1, 12);
+	});
+
+	it('numerical-integration: the energy factors, bands and orders are what the lesson states', () => {
+		type Method = 'euler' | 'semi' | 'verlet' | 'rk4';
+		const energy = (x: number, v: number, w: number) => 0.5 * (v * v + w * w * x * x);
+		function run(method: Method, w: number, dt: number, steps: number) {
+			let x = 1;
+			let v = 0;
+			const e0 = energy(x, v, w);
+			let lo = 1;
+			let hi = 1;
+			for (let i = 0; i < steps; i++) {
+				if (method === 'euler') [x, v] = [x + dt * v, v - dt * w * w * x];
+				else if (method === 'semi') {
+					v -= dt * w * w * x;
+					x += dt * v;
+				} else if (method === 'verlet') {
+					const a = -w * w * x;
+					x += v * dt + 0.5 * a * dt * dt;
+					v += 0.5 * (a - w * w * x) * dt;
+				} else {
+					const f = (p: number, q: number): [number, number] => [q, -w * w * p];
+					const k1 = f(x, v);
+					const k2 = f(x + (dt / 2) * k1[0], v + (dt / 2) * k1[1]);
+					const k3 = f(x + (dt / 2) * k2[0], v + (dt / 2) * k2[1]);
+					const k4 = f(x + dt * k3[0], v + dt * k3[1]);
+					x += (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+					v += (dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+				}
+				const r = energy(x, v, w) / e0;
+				lo = Math.min(lo, r);
+				hi = Math.max(hi, r);
+			}
+			return { lo, hi, last: energy(x, v, w) / e0, x };
+		}
+		// Euler multiplies the energy by exactly 1 + w²dt² each step
+		expect(run('euler', 1, 0.1, 10).last).toBeCloseTo(1.105, 3);
+		expect(run('euler', 1, 0.1, 100).last).toBeCloseTo(1.01 ** 100, 10);
+		expect(run('euler', 1, 0.1, 100).last).toBeCloseTo(2.7, 2);
+		// faded example: w = 2, dt = 0.05, one swing of about 63 steps
+		expect(1 + 4 * 0.05 ** 2).toBeCloseTo(1.01, 12);
+		expect(1.01 ** (Math.PI / 0.05)).toBeCloseTo(1.87, 2);
+		// bounded bands after 100,000 steps
+		const semi = run('semi', 1, 0.1, 100000);
+		expect(semi.lo).toBeGreaterThan(0.95);
+		expect(semi.hi).toBeLessThan(1.054);
+		const verlet = run('verlet', 1, 0.1, 100000);
+		expect(verlet.lo).toBeGreaterThan(0.9974);
+		expect(verlet.hi).toBeLessThanOrEqual(1 + 1e-12);
+		// RK4 loses about 0.0001% in 100 steps and 0.014% in 10,000
+		expect(1 - run('rk4', 1, 0.1, 100).last).toBeLessThan(2e-6);
+		expect(1 - run('rk4', 1, 0.1, 10000).last).toBeCloseTo(0.00014, 5);
+		// orders: halving dt cuts RK4's error by about 16 and Euler's by about 2
+		const err = (m: Method, dt: number) => Math.abs(run(m, 1, dt, Math.round(10 / dt)).x - Math.cos(10));
+		expect(err('rk4', 0.1) / err('rk4', 0.05)).toBeGreaterThan(12);
+		expect(err('rk4', 0.1) / err('rk4', 0.05)).toBeLessThan(20);
+		expect(err('euler', 0.02) / err('euler', 0.01)).toBeCloseTo(2, 0);
+	});
+
+	it('coupled-oscillators: mode frequencies and the energy hand-over time', () => {
+		const w = (k: number, n: number, w0: number) => 2 * w0 * Math.sin((k * Math.PI) / (2 * (n + 1)));
+		expect(w(1, 2, 2)).toBeCloseTo(2, 12);
+		expect(w(2, 2, 2)).toBeCloseTo(3.46, 2);
+		const delta = w(2, 2, 2) - w(1, 2, 2);
+		expect(delta).toBeCloseTo(1.46, 2);
+		expect(Math.PI / delta).toBeCloseTo(2.15, 2);
+		expect((2 * Math.PI) / delta).toBeCloseTo(4.29, 2);
+		// at t = pi/delta the first mass's envelope is zero and the second one's is 1
+		const t = Math.PI / delta;
+		const u1 = (tt: number) => 0.5 * (Math.cos(w(1, 2, 2) * tt) + Math.cos(w(2, 2, 2) * tt));
+		const u2 = (tt: number) => 0.5 * (Math.cos(w(1, 2, 2) * tt) - Math.cos(w(2, 2, 2) * tt));
+		expect(Math.cos(delta * t * 0.5)).toBeCloseTo(0, 12);
+		expect(Math.abs(u1(t))).toBeLessThan(1e-12);
+		expect(Math.abs(u2(t))).toBeGreaterThan(0.4);
+		// the product form of the two-mass motion
+		const sigma = w(1, 2, 2) + w(2, 2, 2);
+		for (const tt of [0.3, 1.1, 3.7]) {
+			expect(u1(tt)).toBeCloseTo(Math.cos((delta * tt) / 2) * Math.cos((sigma * tt) / 2), 12);
+		}
+		// faded example, N = 3, w0 = 10
+		expect(w(1, 3, 10)).toBeCloseTo(7.65, 2);
+		expect(w(2, 3, 10)).toBeCloseTo(14.14, 2);
+		expect(w(3, 3, 10)).toBeCloseTo(18.48, 2);
+		// the mode shape sin(jk pi/(N+1)) is an eigenvector of the chain: -u_{j-1} + 2u_j - u_{j+1} = (w/w0)² u_j
+		const n = 3;
+		for (let k = 1; k <= n; k++) {
+			const u = (j: number) => Math.sin((j * k * Math.PI) / (n + 1));
+			for (let j = 1; j <= n; j++) {
+				const lhs = -u(j - 1) + 2 * u(j) - u(j + 1);
+				expect(lhs).toBeCloseTo(w(k, n, 1) ** 2 * u(j), 12);
+			}
+		}
+	});
+
+	it('density-matrix-decoherence: worked example, faded example and the T2 limit', () => {
+		const state = (t: number, t1: number, t2: number) => {
+			const rx = Math.exp(-t / t2);
+			const rz = 1 - Math.exp(-t / t1);
+			return { rx, rz, len2: rx * rx + rz * rz };
+		};
+		const a = state(3, 6, 4);
+		expect(a.rx).toBeCloseTo(0.472, 3);
+		expect(a.rz).toBeCloseTo(0.393, 3);
+		expect(Math.sqrt(a.len2)).toBeCloseTo(0.615, 3);
+		expect(0.5 * (1 + a.len2)).toBeCloseTo(0.689, 3);
+		expect((1 + a.rz) / 2).toBeCloseTo(0.697, 3);
+		expect(0.5 * (1 + a.rx)).toBeCloseTo(0.736, 3);
+		const b = state(5, 10, 5);
+		expect(b.rx).toBeCloseTo(0.368, 3);
+		expect(b.rz).toBeCloseTo(0.393, 3);
+		expect(b.len2).toBeCloseTo(0.29, 3);
+		expect(0.5 * (1 + b.len2)).toBeCloseTo(0.645, 3);
+		// the phase decays at rate 1/(2 T1) from relaxation alone, so T2 ≤ 2 T1, and 1/Tφ = 1/T2 − 1/(2T1) ≥ 0
+		expect(1 / 4 - 1 / (2 * 6)).toBeCloseTo(1 / 6, 12);
+		expect(Math.sqrt(1 - (1 - Math.exp(-1.7)))).toBeCloseTo(Math.exp(-1.7 / 2), 12);
+		// P(0) rises from 0.5 to about 0.7 in the worked example
+		expect((1 + 0) / 2).toBe(0.5);
+	});
+
+	it('schrodinger-equation: worked example, faded example, tunnelling numbers', () => {
+		const width = (s: number, t: number) => s * Math.sqrt(1 + (t / (2 * s * s)) ** 2);
+		expect(-40 + 1.5 * 20).toBe(-10);
+		expect(width(2, 20)).toBeCloseTo(5.39, 2);
+		expect(width(2, 20) / 2).toBeCloseTo(2.7, 1);
+		expect(width(2, 20) * 0.25).toBeCloseTo(1.35, 2);
+		expect(width(3, 12)).toBeCloseTo(3.61, 2);
+		expect(width(3, 12) / 6).toBeCloseTo(0.6, 2);
+		const T = (k: number, v0: number, a: number) => {
+			const e = 0.5 * k * k;
+			const kappa = Math.sqrt(2 * (v0 - e));
+			return 1 / (1 + (v0 * v0 * Math.sinh(kappa * a) ** 2) / (4 * e * (v0 - e)));
+		};
+		expect(Math.sqrt(2 * 0.3)).toBeCloseTo(0.775, 3);
+		expect(T(1, 0.8, 2)).toBeCloseTo(0.157, 3);
+		expect(T(1, 0.8, 4)).toBeCloseTo(0.0076, 4);
+		expect(T(1, 0.8, 2) / T(1, 0.8, 4)).toBeCloseTo(21, 0);
+		// the lab's grid snaps width 2 to 13 cells of 0.15625, and the exact value there is 0.150
+		expect(T(1, 0.8, 13 * 0.15625)).toBeCloseTo(0.15, 3);
+		// the plane wave solves the free equation when omega = k²/2: i(-i omega) = (1/2) k²
+		const k = 1.3;
+		expect((k * k) / 2).toBeCloseTo(0.845, 12);
 	});
 
 	it('projectile-motion worked example, faded example and notebook cross-reference', () => {
