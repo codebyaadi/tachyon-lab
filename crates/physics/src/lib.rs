@@ -14,3 +14,4 @@ pub mod oscillator;
 pub mod pendulum;
 pub mod projectile;
 pub mod qubit;
+pub mod schrodinger;

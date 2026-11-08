@@ -9,6 +9,7 @@ mod oscillator;
 mod pendulum;
 mod projectile;
 mod qubit;
+mod wave;
 
 pub use coupled::CoupledSim;
 pub use decay::DecaySim;
@@ -17,3 +18,4 @@ pub use oscillator::OscillatorSim;
 pub use pendulum::PendulumSim;
 pub use projectile::ProjectileSim;
 pub use qubit::QubitSim;
+pub use wave::WaveSim;
