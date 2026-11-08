@@ -206,6 +206,8 @@ const api = {
 			numeric: hexToRgba(c.numeric),
 			exact: hexToRgba(c.exact, 0.9),
 			ink: hexToRgba(c.ink),
+			s3: hexToRgba(c.s3),
+			s4: hexToRgba(c.s4),
 			separatrix: hexToRgba(c.ink, 0.4)
 		};
 		dirty = true;

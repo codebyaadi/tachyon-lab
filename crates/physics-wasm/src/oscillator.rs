@@ -12,7 +12,8 @@ const MIN_DT: f64 = 1e-4;
 
 /// Module C2: a damped, driven oscillator `x'' + 2ζω₀x' + ω₀²x = F cos(ω_d t)`.
 ///
-/// Integrates with Euler (0), semi-implicit Euler (1) or RK4 (2) for `duration` seconds and
+/// Integrates with Euler (0), semi-implicit Euler (1), RK4 (2) or velocity Verlet (3, which needs
+/// ζ = 0; with damping it falls back to RK4) for `duration` seconds and
 /// keeps the exact solution to compare against, both as x(t) and as a phase-space path (x, v).
 #[wasm_bindgen]
 pub struct OscillatorSim {
@@ -34,6 +35,7 @@ pub struct OscillatorSim {
     ts: Vec<f64>,
     xs: Vec<f64>,
     vs: Vec<f64>,
+    drifts: Vec<f64>,
     ref_t: Vec<f64>,
     ref_x: Vec<f64>,
     ref_v: Vec<f64>,
@@ -81,6 +83,7 @@ impl OscillatorSim {
             ts: Vec::with_capacity(MAX_SAMPLES),
             xs: Vec::with_capacity(MAX_SAMPLES),
             vs: Vec::with_capacity(MAX_SAMPLES),
+            drifts: Vec::with_capacity(MAX_SAMPLES),
             ref_t: Vec::with_capacity(REF_POINTS),
             ref_x: Vec::with_capacity(REF_POINTS),
             ref_v: Vec::with_capacity(REF_POINTS),
@@ -137,6 +140,7 @@ impl OscillatorSim {
         self.ts.clear();
         self.xs.clear();
         self.vs.clear();
+        self.drifts.clear();
         self.record();
 
         self.ref_t.clear();
@@ -160,6 +164,7 @@ impl OscillatorSim {
             match self.method {
                 0 => self.euler.step(&self.sys, self.t, &mut self.y, self.dt),
                 1 => self.semi.step(&self.sys, self.t, &mut self.y, self.dt),
+                3 if self.sys.zeta == 0.0 => self.verlet_step(),
                 _ => self.rk4.step(&self.sys, self.t, &mut self.y, self.dt),
             }
             self.t += self.dt;
@@ -238,6 +243,10 @@ impl OscillatorSim {
     pub fn vs_ptr(&self) -> *const f64 {
         self.vs.as_ptr()
     }
+    /// Energy drift (E − E₀)/E₀ at every sample; sample `i` is at time `i·dt`.
+    pub fn drift_ptr(&self) -> *const f64 {
+        self.drifts.as_ptr()
+    }
     pub fn reference_len(&self) -> usize {
         self.ref_t.len()
     }
@@ -253,6 +262,21 @@ impl OscillatorSim {
 }
 
 impl OscillatorSim {
+    /// One velocity-Verlet step for x'' = −ω₀²x + F cos(ω_d t) (no damping).
+    fn verlet_step(&mut self) {
+        let (w2, f, wd) = (
+            self.sys.omega0 * self.sys.omega0,
+            self.sys.force,
+            self.sys.omega_drive,
+        );
+        let (t0, dt) = (self.t, self.dt);
+        let a0 = -w2 * self.y[X] + f * (wd * t0).cos();
+        let v_half = self.y[V] + 0.5 * dt * a0;
+        self.y[X] += dt * v_half;
+        let a1 = -w2 * self.y[X] + f * (wd * (t0 + dt)).cos();
+        self.y[V] = v_half + 0.5 * dt * a1;
+    }
+
     fn exact(&self, t: f64) -> (f64, f64) {
         let s = damped_driven_oscillator(
             self.x0,
@@ -270,6 +294,11 @@ impl OscillatorSim {
         self.ts.push(self.t);
         self.xs.push(self.y[X]);
         self.vs.push(self.y[V]);
+        self.drifts.push(if self.e0 > 0.0 {
+            (self.sys.energy(&self.y) - self.e0) / self.e0
+        } else {
+            0.0
+        });
         let err = (self.y[X] - self.exact(self.t).0).abs();
         if err.is_finite() {
             self.max_err = self.max_err.max(err);
@@ -312,6 +341,18 @@ mod tests {
         let sim = OscillatorSim::new(1.0, 0.0, 2.0, 0.0, 0.0, 2.0, 20.0, 0.02, 2);
         assert!((sim.reference_max_x() - 1.0).abs() < 0.01);
         assert!((sim.reference_max_v() - 2.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn verlet_keeps_the_energy_bounded_and_the_history_is_recorded() {
+        let mut sim = OscillatorSim::new(1.0, 0.0, 2.0, 0.0, 0.0, 1.0, 100.0, 0.05, 3);
+        run(&mut sim);
+        assert_eq!(sim.drifts.len(), sim.len());
+        let worst = sim.drifts.iter().fold(0.0_f64, |m, d| m.max(d.abs()));
+        assert!(worst < 0.01 * 2.0, "Verlet drift {worst}");
+        // Second order: the phase error over 100 s is a few hundredths of a metre, not 1e-8.
+        assert!(sim.max_abs_error() < 0.2, "{}", sim.max_abs_error());
+        assert!((sim.drifts[sim.len() - 1] - (sim.energy() / sim.energy0() - 1.0)).abs() < 1e-12);
     }
 
     #[test]

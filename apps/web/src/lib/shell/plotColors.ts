@@ -1,5 +1,13 @@
 /** Colours the worker needs to draw a plot, read from the page's CSS variables (theme aware). */
-export type PlotColors = { bg: string; grid: string; numeric: string; exact: string; ink: string };
+export type PlotColors = {
+	bg: string;
+	grid: string;
+	numeric: string;
+	exact: string;
+	ink: string;
+	s3: string;
+	s4: string;
+};
 
 export function cssColors(): PlotColors {
 	const cs = getComputedStyle(document.documentElement);
@@ -9,6 +17,8 @@ export function cssColors(): PlotColors {
 		grid: get('--line'),
 		numeric: get('--series-1'),
 		exact: get('--series-2'),
-		ink: get('--ink')
+		ink: get('--ink'),
+		s3: get('--series-3'),
+		s4: get('--series-4')
 	};
 }

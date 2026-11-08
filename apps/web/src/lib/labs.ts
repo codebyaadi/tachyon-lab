@@ -44,6 +44,13 @@ export const LABS: LabInfo[] = [
 		lessons: []
 	},
 	{
+		href: '/lab/integrators',
+		title: 'Which integrator keeps energy?',
+		blurb:
+			'Euler, semi-implicit Euler, RK4 and velocity Verlet side by side. See which energy errors grow and which stay bounded.',
+		lessons: []
+	},
+	{
 		href: '/lab/decay',
 		title: 'Exponential decay',
 		blurb: 'Euler vs RK4 against the exact solution. Watch an integrator go unstable.',

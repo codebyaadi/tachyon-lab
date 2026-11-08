@@ -39,6 +39,7 @@ pub struct OrbitSim {
     diverged: bool,
     xs: Vec<f64>,
     ys: Vec<f64>,
+    drifts: Vec<f64>,
     ref_x: Vec<f64>,
     ref_y: Vec<f64>,
 }
@@ -71,6 +72,7 @@ impl OrbitSim {
             diverged: false,
             xs: Vec::with_capacity(MAX_SAMPLES),
             ys: Vec::with_capacity(MAX_SAMPLES),
+            drifts: Vec::with_capacity(MAX_SAMPLES),
             ref_x: Vec::with_capacity(REF_POINTS),
             ref_y: Vec::with_capacity(REF_POINTS),
         };
@@ -104,6 +106,7 @@ impl OrbitSim {
         self.diverged = false;
         self.xs.clear();
         self.ys.clear();
+        self.drifts.clear();
         self.record();
 
         self.ref_x.clear();
@@ -220,6 +223,10 @@ impl OrbitSim {
     pub fn ys_ptr(&self) -> *const f64 {
         self.ys.as_ptr()
     }
+    /// Energy drift (E − E₀)/|E₀| at every sample; sample `i` is at time `i·dt`.
+    pub fn drift_ptr(&self) -> *const f64 {
+        self.drifts.as_ptr()
+    }
     pub fn reference_len(&self) -> usize {
         self.ref_x.len()
     }
@@ -254,6 +261,7 @@ impl OrbitSim {
     fn record(&mut self) {
         self.xs.push(self.y[X]);
         self.ys.push(self.y[Y]);
+        self.drifts.push(self.energy_drift());
         let r = self.y[X].hypot(self.y[Y]);
         if r.is_finite() {
             self.r_min = self.r_min.min(r);
