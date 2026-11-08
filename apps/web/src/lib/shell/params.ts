@@ -25,13 +25,25 @@ export type ChoiceSpec = {
 	help?: string;
 };
 
-export type ParamSpec = NumberSpec | ChoiceSpec;
+/** A value the page edits itself (not with a slider or a select), such as a list of gates. It is still validated and shared in the link. */
+export type TextSpec = {
+	kind: 'text';
+	key: string;
+	label: string;
+	/** The whole value must match this. */
+	pattern: RegExp;
+	maxLength: number;
+};
+
+export type ParamSpec = NumberSpec | ChoiceSpec | TextSpec;
+/** Specs that get a control in the parameter panel. */
+export type PanelSpec = NumberSpec | ChoiceSpec;
 export type ParamValues = Record<string, number | string>;
 
 function fieldSchema(spec: ParamSpec) {
-	return spec.kind === 'number'
-		? v.pipe(v.number(), v.finite(), v.minValue(spec.min), v.maxValue(spec.max))
-		: v.picklist(spec.options.map((o) => o.value));
+	if (spec.kind === 'number') return v.pipe(v.number(), v.finite(), v.minValue(spec.min), v.maxValue(spec.max));
+	if (spec.kind === 'text') return v.pipe(v.string(), v.maxLength(spec.maxLength), v.regex(spec.pattern));
+	return v.picklist(spec.options.map((o) => o.value));
 }
 
 /**

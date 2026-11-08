@@ -54,6 +54,13 @@ export function createSimHost<P extends ParamValues, X extends object = object>(
 		history.replaceState(history.state, '', `#${hash}`);
 	}
 
+	function patch(changes: Partial<P>) {
+		params = { ...params, ...changes };
+		void api?.setParams(snapshot());
+		clearTimeout(hashTimer);
+		hashTimer = setTimeout(writeHash, 150);
+	}
+
 	onMount(() => {
 		let disposed = false;
 		const slowTimer = setTimeout(() => (slow = true), 6000);
@@ -146,12 +153,9 @@ export function createSimHost<P extends ParamValues, X extends object = object>(
 			return slow;
 		},
 		/** A slider or select changed. */
-		onParam(key: string, value: number | string) {
-			params = { ...params, [key]: value };
-			void api?.setParams(snapshot());
-			clearTimeout(hashTimer);
-			hashTimer = setTimeout(writeHash, 150);
-		},
+		onParam: (key: string, value: number | string) => patch({ [key]: value } as Partial<P>),
+		/** Change several parameters at once, with a single message to the worker. */
+		patch,
 		/**
 		 * Call an extra method the worker exposes beyond the standard ones (for example "apply this gate").
 		 * `X` describes those extra methods, so the name and arguments are type-checked.

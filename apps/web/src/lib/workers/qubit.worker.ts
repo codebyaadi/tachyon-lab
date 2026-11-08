@@ -10,7 +10,17 @@
  */
 import * as Comlink from 'comlink';
 import { hexToRgba, LinePlot, type RGBA } from '../gl/linePlot';
-import { AXIS_LABELS, LABEL_RADIUS, type QubitParams, R, READOUT_LEN, START_CODE } from '../modules/qubit/params';
+import { gateToken, joinCircuit, parseCircuit } from '../modules/qubit/circuit';
+import {
+	AXIS_LABELS,
+	GATES,
+	LABEL_RADIUS,
+	type QubitParams,
+	R,
+	READOUT_LEN,
+	MAX_GATES,
+	START_CODE
+} from '../modules/qubit/params';
 import { fitCentered } from '../shell/fitRange';
 import type { PlotColors } from '../shell/plotColors';
 import init, { QubitSim } from '../wasm/pkg/physics_wasm.js';
@@ -20,11 +30,14 @@ const CIRCLE_POINTS = 96;
 const TRAIL_POINTS = 360;
 /** Half-width of the view: the sphere has radius 1, and the labels sit just outside it. */
 const VIEW = 1.3;
+const LATITUDES = [Math.PI / 6, -Math.PI / 6];
 
 let sim: QubitSim | undefined;
 let plot: LinePlot;
 let readouts: Float64Array<ArrayBufferLike> = new Float64Array(READOUT_LEN);
-let colors: { bg: RGBA; grid: RGBA; noisy: RGBA; ideal: RGBA; front: RGBA; back: RGBA };
+let colors: { bg: RGBA; grid: RGBA; noisy: RGBA; ideal: RGBA; front: RGBA; back: RGBA; faint: RGBA };
+/** The gates applied since the last restart, as circuit tokens. The page's `circuit` parameter mirrors it. */
+let applied: string[] = [];
 let params: QubitParams;
 let running = false;
 let dirty = true;
@@ -85,13 +98,35 @@ function drawPolyline(flat: number[], color: RGBA, width: number) {
 	plot.series(xs, ys, n, color, width);
 }
 
-/** An arrow from the centre to (x, y, z): a line and a dot at the tip. */
+/** An arrow from the centre to (x, y, z): a line, two barbs and a dot at the tip. */
 function drawVector(x: number, y: number, z: number, color: RGBA, lineWidth: number, dotWidth: number) {
 	const [sx, sy] = project(x, y, z);
 	const [ox, oy] = project(0, 0, 0);
 	drawPolyline([ox, oy, sx, sy], color, lineWidth);
+	const dx = sx - ox;
+	const dy = sy - oy;
+	const len = Math.hypot(dx, dy);
+	// The barbs point back along the arrow; skip them when it points almost straight at or away from the viewer.
+	if (len > 0.12) {
+		const ux = dx / len;
+		const uy = dy / len;
+		const back = 0.11;
+		const side = 0.05;
+		const bx = sx - ux * back;
+		const by = sy - uy * back;
+		drawPolyline([bx - uy * side, by + ux * side, sx, sy, bx + uy * side, by - ux * side], color, lineWidth);
+	}
 	const tick = (plot.range.x1 - plot.range.x0) * 0.0015;
 	drawPolyline([sx, sy, sx + tick, sy], color, dotWidth);
+}
+
+/** Thin guide lines from the tip straight down to the equator and in to the axis: they show the height (P(0)) and the phase. */
+function drawGuides(x: number, y: number, z: number) {
+	if (Math.abs(z) < 0.02 || Math.hypot(x, y) < 0.02) return;
+	const [tx, ty] = project(x, y, z);
+	const [fx, fy] = project(x, y, 0);
+	const [ox, oy] = project(0, 0, 0);
+	drawPolyline([tx, ty, fx, fy, Number.NaN, Number.NaN, ox, oy, fx, fy], colors.front, 1);
 }
 
 function publishLabels() {
@@ -129,6 +164,11 @@ function draw(s: QubitSim) {
 	const equator = circle((t) => [Math.cos(t), Math.sin(t), 0]);
 	const meridianX = circle((t) => [Math.cos(t), 0, Math.sin(t)]);
 	const meridianY = circle((t) => [0, Math.cos(t), Math.sin(t)]);
+	// Two lines of latitude (at 30° north and south) make the surface read as a ball.
+	const lat = LATITUDES.map((phi) =>
+		circle((t) => [Math.cos(phi) * Math.cos(t), Math.cos(phi) * Math.sin(t), Math.sin(phi)])
+	);
+	for (const c of lat) drawPolyline(c.back, colors.back, 1);
 	for (const c of [equator, meridianX, meridianY]) drawPolyline(c.back, colors.back, 1.5);
 	const axes: number[] = [];
 	for (const [ax, ay, az] of [
@@ -141,7 +181,9 @@ function draw(s: QubitSim) {
 		axes.push(x1, y1, x2, y2, Number.NaN, Number.NaN);
 	}
 	drawPolyline(axes, colors.grid, 1);
+	for (const c of lat) drawPolyline(c.front, colors.faint, 1);
 	for (const c of [equator, meridianX, meridianY]) drawPolyline(c.front, colors.front, 1.5);
+	drawGuides(s.x(), s.y(), s.z());
 
 	// The trail of the noisy state, then the ideal arrow, then the noisy arrow on top.
 	for (let i = 0; i < trailLen; i++) {
@@ -184,8 +226,23 @@ function build(p: QubitParams) {
 	const noise = p.noise === 'on';
 	if (sim) sim.set_params(START_CODE[p.start], p.t1, p.t2, noise, p.speed);
 	else sim = new QubitSim(START_CODE[p.start], p.t1, p.t2, noise, p.speed);
+	applied = [];
 	clearTrail();
 	pushTrail(sim.x(), sim.y(), sim.z());
+}
+
+/** Put the gates of a shared or restored circuit on the qubit at once, with no animation. */
+function replay(circuit: string) {
+	const s = getSim();
+	for (const step of parseCircuit(circuit)) {
+		s.queue_gate(step.code, step.angle);
+		applied.push(gateToken(step.id, step.angle));
+	}
+	while (s.advance(1, false)) {
+		// each call finishes at least one gate
+	}
+	clearTrail();
+	pushTrail(s.x(), s.y(), s.z());
 }
 
 function frame(now: number) {
@@ -220,6 +277,7 @@ const api = {
 		api.setColors(c);
 		params = p;
 		build(p);
+		replay(p.circuit);
 		refit();
 		lastFrame = performance.now();
 		requestNext();
@@ -234,9 +292,11 @@ const api = {
 			p.t2 !== params.t2 ||
 			p.speed !== params.speed;
 		params = p;
-		if (restart) {
+		// A new circuit that is not just the gates already applied (a pasted link) is rebuilt from the start.
+		if (restart || p.circuit !== joinCircuit(applied)) {
 			build(p);
-			running = false;
+			replay(p.circuit);
+			if (restart) running = false;
 		}
 		dirty = true;
 	},
@@ -247,7 +307,8 @@ const api = {
 			noisy: hexToRgba(c.numeric),
 			ideal: hexToRgba(c.exact, 0.9),
 			front: hexToRgba(c.ink, 0.4),
-			back: hexToRgba(c.ink, 0.15)
+			back: hexToRgba(c.ink, 0.15),
+			faint: hexToRgba(c.ink, 0.2)
 		};
 		dirty = true;
 	},
@@ -274,7 +335,10 @@ const api = {
 	},
 	/** Apply a gate (see QubitSim.queue_gate for the codes). The state turns smoothly to the result. */
 	gate(code: number, angleDeg: number) {
+		const g = GATES.find((x) => x.code === code);
+		if (!g || applied.length >= MAX_GATES) return;
 		getSim().queue_gate(code, angleDeg);
+		applied.push(gateToken(g.id, angleDeg));
 		dirty = true;
 	},
 	/** Fallback when SharedArrayBuffer is unavailable. */

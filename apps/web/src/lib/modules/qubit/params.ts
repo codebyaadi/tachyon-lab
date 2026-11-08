@@ -11,7 +11,15 @@ export type QubitParams = {
 	angle: number;
 	az: number;
 	el: number;
+	/** The gates applied so far, written like "H.T.Rx90.H" (see circuit.ts). */
+	circuit: string;
 };
+
+/** The most gates a circuit may hold (a shared link cannot make the page replay thousands). */
+export const MAX_GATES = 60;
+const TOKEN = '(?:X|Y|Z|H|Sdg|S|T|R[xyz]\\d{1,3})';
+/** A circuit is written as gate names joined by dots, for example "H.T.Rx90.H". Empty means no gates. */
+export const CIRCUIT_PATTERN = new RegExp(`^(?:${TOKEN}(?:\\.${TOKEN})*)?$`);
 
 export const DEFAULTS: QubitParams = {
 	start: 'zero',
@@ -21,7 +29,8 @@ export const DEFAULTS: QubitParams = {
 	speed: 1,
 	angle: 90,
 	az: 35,
-	el: 20
+	el: 20,
+	circuit: ''
 };
 
 export const SPECS: ParamSpec[] = [
@@ -88,7 +97,9 @@ export const SPECS: ParamSpec[] = [
 		help: 'Run noise faster or slower than the clock.'
 	},
 	{ kind: 'number', key: 'az', label: 'View: turn around', min: -180, max: 180, step: 5, unit: '°' },
-	{ kind: 'number', key: 'el', label: 'View: tilt', min: -80, max: 80, step: 5, unit: '°' }
+	{ kind: 'number', key: 'el', label: 'View: tilt', min: -80, max: 80, step: 5, unit: '°' },
+	// Not in the panel: the gate buttons build it.
+	{ kind: 'text', key: 'circuit', label: 'Circuit', pattern: CIRCUIT_PATTERN, maxLength: MAX_GATES * 8 }
 ];
 
 /** Start-state name → the number the wasm `QubitSim` expects. */

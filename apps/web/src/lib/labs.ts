@@ -20,14 +20,15 @@ export const LABS: LabInfo[] = [
 		blurb: 'A spring with damping and a driving force. See resonance, and watch Euler add energy that is not there.',
 		lessons: [
 			{ href: '/learn/classical/simple-harmonic-motion', title: 'Simple harmonic motion' },
-			{ href: '/learn/classical/damped-oscillations', title: 'Damped oscillations' }
+			{ href: '/learn/classical/damped-oscillations', title: 'Damped oscillations' },
+			{ href: '/learn/classical/driven-oscillations-resonance', title: 'Driven oscillations and resonance' }
 		]
 	},
 	{
 		href: '/lab/pendulum',
 		title: 'The pendulum',
 		blurb: 'Why big swings are slower, where swinging turns into spinning, and how phase space shows the boundary.',
-		lessons: []
+		lessons: [{ href: '/learn/classical/pendulum', title: 'The pendulum and nonlinear oscillations' }]
 	},
 	{
 		href: '/lab/coupled',
@@ -41,7 +42,7 @@ export const LABS: LabInfo[] = [
 		title: "Orbits and Kepler's laws",
 		blurb:
 			'Launch a planet around a star and compare four integrators with the exact ellipse. See which ones conserve energy and angular momentum.',
-		lessons: []
+		lessons: [{ href: '/learn/classical/keplers-laws', title: "Kepler's laws and orbit shapes" }]
 	},
 	{
 		href: '/lab/integrators',
@@ -54,7 +55,7 @@ export const LABS: LabInfo[] = [
 		href: '/lab/qubit',
 		title: 'The qubit and the Bloch sphere',
 		blurb: 'Turn a qubit with quantum gates, then switch on noise and watch its state decay.',
-		lessons: []
+		lessons: [{ href: '/learn/quantum/bloch-sphere', title: 'The qubit and the Bloch sphere' }]
 	},
 	{
 		href: '/lab/decay',

@@ -97,8 +97,27 @@ const verifiers: Record<string, () => number> = {
 	'classical/simple-harmonic-motion#q1': () => 2 * Math.PI * Math.sqrt(0.25 / 25),
 	'classical/simple-harmonic-motion#q2': () => 0.03 * Math.sqrt(160 / 0.4),
 	'classical/damped-oscillations#q1': () => 2 * Math.sqrt(100 * 0.25),
-	'classical/damped-oscillations#q2': () => Math.LN2 / (0.5 / (2 * 1.0))
+	'classical/damped-oscillations#q2': () => Math.LN2 / (0.5 / (2 * 1.0)),
+	'classical/driven-oscillations-resonance#q1': () => 4 / (2 * Math.sqrt(200 / 0.5)),
+	'classical/driven-oscillations-resonance#q2': () => 1 / (2 * 0.02),
+	'classical/pendulum#q1': () => 2 * Math.PI * Math.sqrt(0.5 / 9.8),
+	'classical/pendulum#q2': () => 9.81 * (2 / (2 * Math.PI)) ** 2,
+	'classical/keplers-laws#q1': () => 4 ** 1.5,
+	'classical/keplers-laws#q2': () => 76 ** (2 / 3),
+	'classical/keplers-laws#q3': () => (3.0 * 2.0) / 1.0,
+	'quantum/bloch-sphere#q1': () => Math.cos(Math.PI / 6) ** 2,
+	'quantum/bloch-sphere#q2': () => (1 - 0.6) / 2,
+	'quantum/bloch-sphere#q3': () => 1 + (-1 - 1) * Math.exp(-5 / 5)
 };
+
+/** Complete elliptic integral of the first kind, by the arithmetic-geometric mean. */
+function ellipK(k: number): number {
+	let a = 1;
+	let b = Math.sqrt(1 - k * k);
+	for (let i = 0; i < 40; i++) [a, b] = [(a + b) / 2, Math.sqrt(a * b)];
+	return Math.PI / (2 * a);
+}
+const periodFactor = (thetaDeg: number) => (2 / Math.PI) * ellipK(Math.sin((thetaDeg * Math.PI) / 360));
 
 describe('numbers in lessons are verified', () => {
 	for (const l of lessons) {
@@ -185,6 +204,134 @@ describe('numbers in lessons are verified', () => {
 			const d2 = (x(t + h) - 2 * x(t) + x(t - h)) / (h * h);
 			expect(Math.abs(d2 + 2 * z * w0 * d1 + w0 ** 2 * x(t))).toBeLessThan(1e-5);
 		}
+	});
+
+	it('driven-oscillations-resonance worked example and faded example', () => {
+		const A = (m: number, k: number, b: number, F: number, w: number) => {
+			const w0 = Math.sqrt(k / m);
+			const z = b / (2 * Math.sqrt(k * m));
+			return F / m / Math.hypot(w0 * w0 - w * w, 2 * z * w0 * w);
+		};
+		expect(A(1, 100, 1, 2, 10)).toBeCloseTo(0.2, 12);
+		expect(A(1, 100, 1, 2, 10) / (2 / 100)).toBeCloseTo(10, 10);
+		expect(Math.hypot(75, 5)).toBeCloseTo(75.17, 2);
+		expect(A(1, 100, 1, 2, 5)).toBeCloseTo(0.027, 3);
+		expect(0.2 / A(1, 100, 1, 2, 5)).toBeGreaterThan(7.5); // "nearly eight times smaller"
+		// true peak shift at zeta = 0.05 is 0.25%
+		expect(1 - Math.sqrt(1 - 2 * 0.05 ** 2)).toBeCloseTo(0.0025, 4);
+		// faded example: m = 2, k = 50, b = 2, F = 1, driven at omega0 = 5
+		expect(2 / (2 * Math.sqrt(100))).toBeCloseTo(0.1, 12);
+		expect(A(2, 50, 2, 1, 5)).toBeCloseTo(0.1, 12);
+		expect(A(2, 50, 2, 1, 5) / (1 / 50)).toBeCloseTo(5, 10);
+		// the peak vanishes at zeta = 1/sqrt(2)
+		expect(1 - 2 * 0.5).toBeCloseTo(0, 12);
+		// undamped, driven at resonance: the amplitude of x'' + w0^2 x = F/m cos(w0 t) is F t / (2 m w0), growing with time
+		const w0 = 3;
+		const x = (t: number) => (t * Math.sin(w0 * t)) / (2 * w0);
+		const h = 1e-4;
+		for (const t of [1, 2.5]) {
+			const d2 = (x(t + h) - 2 * x(t) + x(t - h)) / (h * h);
+			expect(Math.abs(d2 + w0 ** 2 * x(t) - Math.cos(w0 * t))).toBeLessThan(1e-4);
+		}
+	});
+
+	it('pendulum worked example, faded example and predictions', () => {
+		const w0 = Math.sqrt(9.81);
+		const T0 = (2 * Math.PI) / w0;
+		expect(w0).toBeCloseTo(3.13, 2);
+		expect(T0).toBeCloseTo(2.006, 3);
+		expect(periodFactor(60)).toBeCloseTo(1.0732, 4);
+		expect(T0 * periodFactor(60)).toBeCloseTo(2.153, 3);
+		const th = Math.PI / 3;
+		expect(1 + th ** 2 / 16).toBeCloseTo(1.069, 3);
+		expect(1 - (1 + th ** 2 / 16) / periodFactor(60)).toBeCloseTo(0.004, 3);
+		// faded example: omega0 = 3
+		expect((2 * Math.PI) / 3).toBeCloseTo(2.094, 3);
+		expect(periodFactor(120)).toBeCloseTo(1.373, 3);
+		expect(((2 * Math.PI) / 3) * 1.373).toBeCloseTo(2.875, 2);
+		// predict: 120 degrees takes 1.37 times as long, about 2.75 s from 2.00 s
+		expect(2.0 * periodFactor(120)).toBeCloseTo(2.75, 2);
+		// 170 degrees: more than twice as long (about 2.4)
+		expect(periodFactor(170)).toBeGreaterThan(2);
+		expect(periodFactor(170)).toBeCloseTo(2.4, 1);
+		// the small-angle formula is good to under 1% at 20 degrees
+		expect(Math.abs(periodFactor(20) - 1)).toBeLessThan(0.01);
+		// energy: reaching the top needs speed 2*omega0 at the bottom
+		expect(0.5 * (2 * w0) ** 2).toBeCloseTo(2 * w0 ** 2, 12);
+	});
+
+	it('keplers-laws worked example, faded example and lab claims', () => {
+		// Mars: a = 1.524 AU, e = 0.0934
+		const a = 1.524;
+		const e = 0.0934;
+		expect(a ** 3).toBeCloseTo(3.54, 2);
+		expect(a ** 1.5).toBeCloseTo(1.881, 3);
+		expect(a * (1 - e)).toBeCloseTo(1.382, 3);
+		expect(a * (1 + e)).toBeCloseTo(1.666, 3);
+		expect((1 + e) / (1 - e)).toBeCloseTo(1.206, 3);
+		expect((a * (1 + e)) / (a * (1 - e))).toBeCloseTo(1.206, 3);
+		// faded example: a = 2, e = 0.5
+		expect(2 ** 1.5).toBeCloseTo(2.83, 2);
+		expect(2 * (1 - 0.5)).toBe(1);
+		expect(2 * (1 + 0.5)).toBe(3);
+		expect(1.5 / 0.5).toBe(3);
+		// q2 intermediate: 76^2 = 5776, cube root 17.94
+		expect(76 ** 2).toBe(5776);
+		expect(Math.cbrt(5776)).toBeCloseTo(17.94, 2);
+		// lab claim: launching tangentially at 1.2 times circular speed. vis-viva with GM = 1, r = 1: a = r / (2 - v²)
+		const semi = 1 / (2 - 1.2 ** 2);
+		expect(semi).toBeCloseTo(1.79, 2);
+		expect(semi ** 1.5).toBeCloseTo(2.39, 2);
+		// the launch point is the closest point: e = v² - 1 = 0.44 and r_p = a(1 - e) = 1
+		expect(semi * (1 - (1.2 ** 2 - 1))).toBeCloseTo(1, 12);
+		expect(4 * Math.PI ** 2).toBeCloseTo(39.48, 2);
+		// Kepler III in SI for the Sun and Earth gives T^2/a^3 = 4 pi^2 / GM
+		const GM = 1.32712440018e20;
+		const T = 365.256363 * 86400;
+		const aEarth = Math.cbrt((GM * T ** 2) / (4 * Math.PI ** 2));
+		expect(aEarth / 1.495978707e11).toBeCloseTo(1, 3);
+	});
+
+	it('bloch-sphere worked example, faded example and noise numbers', () => {
+		// H maps (x, y, z) to (z, -y, x); S turns 90 degrees and T 45 degrees about z
+		const H = ([x, y, z]: number[]) => [z, -y, x];
+		const Rz =
+			(deg: number) =>
+			([x, y, z]: number[]) => {
+				const c = Math.cos((deg * Math.PI) / 180);
+				const s = Math.sin((deg * Math.PI) / 180);
+				return [x * c - y * s, x * s + y * c, z];
+			};
+		const p0 = (r: number[]) => (1 + r[2]) / 2;
+		const r1 = H([0, 0, 1]);
+		expect(r1[0]).toBe(1);
+		expect(r1[1]).toBeCloseTo(0, 12);
+		expect(r1[2]).toBeCloseTo(0, 12);
+		const r2 = Rz(45)(r1);
+		expect(r2[0]).toBeCloseTo(0.707, 3);
+		expect(r2[1]).toBeCloseTo(0.707, 3);
+		const r3 = H(r2);
+		expect(r3[0]).toBeCloseTo(0, 12);
+		expect(r3[1]).toBeCloseTo(-0.707, 3);
+		expect(r3[2]).toBeCloseTo(0.707, 3);
+		expect(p0(r3)).toBeCloseTo(0.854, 3);
+		expect(p0(r3)).toBeCloseTo(Math.cos(Math.PI / 8) ** 2, 12);
+		expect(Math.hypot(...r3)).toBeCloseTo(1, 12);
+		// faded example: H, S, H
+		const f = H(Rz(90)(H([0, 0, 1])));
+		expect(f[0]).toBeCloseTo(0, 12);
+		expect(f[1]).toBeCloseTo(-1, 12);
+		expect(f[2]).toBeCloseTo(0, 12);
+		expect(p0(f)).toBeCloseTo(0.5, 12);
+		// P(0) = cos²(θ/2) = (1 + cos θ) / 2
+		for (const th of [0.3, 1.1, 2.9]) expect(Math.cos(th / 2) ** 2).toBeCloseTo((1 + Math.cos(th)) / 2, 12);
+		// 1 - 2/e
+		expect(1 - 2 / Math.E).toBeCloseTo(0.264, 3);
+		// the Bloch vector of the lesson's state formula has length 1
+		const th = 0.8;
+		const ph = 1.9;
+		const v = [Math.sin(th) * Math.cos(ph), Math.sin(th) * Math.sin(ph), Math.cos(th)];
+		expect(Math.hypot(...v)).toBeCloseTo(1, 12);
 	});
 
 	it('projectile-motion worked example, faded example and notebook cross-reference', () => {

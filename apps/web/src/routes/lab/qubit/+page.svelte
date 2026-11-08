@@ -1,10 +1,11 @@
 <script lang="ts">
 	import 'katex/dist/katex.min.css';
-	import { untrack } from 'svelte';
+	import { gateToken, joinCircuit, parseCircuit } from '#lib/modules/qubit/circuit.ts';
 	import {
 		AXIS_LABELS,
 		DEFAULTS,
 		GATES,
+		MAX_GATES,
 		type QubitParams,
 		R,
 		READOUT_LEN,
@@ -22,8 +23,6 @@
 
 	let mode = $state<'learn' | 'inspect'>('learn');
 	let prediction = $state('');
-	let tried = $state(false);
-	let history = $state<string[]>([]);
 	let host: HTMLDivElement;
 
 	const sim = createSimHost<QubitParams, { gate: (code: number, angleDeg: number) => void }>({
@@ -45,40 +44,69 @@
 	const effT2 = $derived(readouts[R.effT2]);
 	const t2Limited = $derived(noiseOn && params.t2 > 2 * params.t1);
 
-	// A new starting state or new noise settings restarts the circuit, so the gate list starts over too.
-	$effect(() => {
-		void [params.start, params.noise, params.t1, params.t2, params.speed];
-		untrack(() => {
-			history = [];
-			tried = false;
-		});
-	});
+	// The circuit lives in the parameters (so it is in the share link). Changing the start state or the
+	// noise settings keeps it and applies the same gates to the new qubit.
+	const steps = $derived(parseCircuit(params.circuit));
+	const full = $derived(steps.length >= MAX_GATES);
 
-	function apply(id: string, code: number, label: string) {
-		const rotation = id === 'Rx' || id === 'Ry' || id === 'Rz';
+	function apply(id: string, code: number) {
+		if (full) return;
 		sim.command('gate', code, params.angle);
-		history = [...history, rotation ? `${label}(${params.angle}°)` : label];
+		sim.onParam('circuit', joinCircuit([...steps.map((s) => gateToken(s.id, s.angle)), gateToken(id, params.angle)]));
 	}
 
 	function reset() {
 		sim.reset();
-		history = [];
-		tried = false;
+		sim.onParam('circuit', '');
 	}
+
+	const PREDICT_CIRCUIT = 'H.T.H';
 
 	/** The prediction question: H, then T, then H, starting from |0⟩ with a perfect qubit. */
 	function trySequence() {
-		sim.reset();
-		for (const id of ['H', 'T', 'H']) {
-			const g = GATES.find((x) => x.id === id);
-			if (g) sim.command('gate', g.code, 0);
-		}
-		history = ['H', 'T', 'H'];
-		tried = true;
+		// Clearing the circuit makes the worker restart from |0⟩, then the three gates animate.
+		sim.patch({ start: 'zero', noise: 'off', circuit: '' });
+		for (const s of parseCircuit(PREDICT_CIRCUIT)) sim.command('gate', s.code, s.angle);
+		sim.onParam('circuit', PREDICT_CIRCUIT);
 	}
 
 	const exactP0 = Math.cos(Math.PI / 8) ** 2;
 	const predicted = $derived(Number.parseFloat(prediction));
+	const tried = $derived(params.circuit === PREDICT_CIRCUIT && params.start === 'zero' && !noiseOn);
+
+	// Drag the sphere to turn it; the arrow keys do the same.
+	let drag = $state<{ x: number; y: number; az: number; el: number }>();
+	const turn = (az: number, el: number) => {
+		const wrapped = ((((az + 180) % 360) + 360) % 360) - 180;
+		sim.patch({ az: Math.round(wrapped), el: Math.round(Math.max(-80, Math.min(80, el))) });
+	};
+	function onDown(e: PointerEvent) {
+		if (!ready) return;
+		drag = { x: e.clientX, y: e.clientY, az: params.az, el: params.el };
+		host.setPointerCapture(e.pointerId);
+	}
+	function onMove(e: PointerEvent) {
+		if (!drag) return;
+		// On a touch screen only sideways drags turn it, so the page can still scroll.
+		const dy = e.pointerType === 'touch' ? 0 : e.clientY - drag.y;
+		turn(drag.az + (e.clientX - drag.x) * 0.5, drag.el + dy * 0.5);
+	}
+	function onUp() {
+		drag = undefined;
+	}
+	function onKey(e: KeyboardEvent) {
+		const step = e.shiftKey ? 15 : 5;
+		const moves: Record<string, [number, number]> = {
+			ArrowLeft: [-step, 0],
+			ArrowRight: [step, 0],
+			ArrowUp: [0, -step],
+			ArrowDown: [0, step]
+		};
+		const m = moves[e.key];
+		if (!m) return;
+		e.preventDefault();
+		turn(params.az + m[0], params.el + m[1]);
+	}
 
 	const labels = $derived(
 		AXIS_LABELS.map((l, i) => {
@@ -125,7 +153,20 @@
 
 <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_300px]">
 	<section class="min-w-0">
-		<div bind:this={host} class="panel relative h-[min(62vh,460px)]">
+		<!-- A custom 3D control: it is an "application" region, focusable, with arrow-key support. -->
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
+		<div
+			bind:this={host}
+			class="panel relative h-[min(62vh,460px)] touch-pan-y select-none {drag ? 'cursor-grabbing' : 'cursor-grab'}"
+			role="application"
+			tabindex="0"
+			aria-label="Bloch sphere. Drag, or use the arrow keys, to turn it."
+			onpointerdown={onDown}
+			onpointermove={onMove}
+			onpointerup={onUp}
+			onpointercancel={onUp}
+			onkeydown={onKey}
+		>
 			<div
 				class="pointer-events-none absolute font-mono text-xs text-muted"
 				style="left:{PLOT_PAD.left}px; right:{PLOT_PAD.right}px; top:{PLOT_PAD.top}px; bottom:{PLOT_PAD.bottom}px"
@@ -138,6 +179,14 @@
 				{/each}
 			</div>
 			<SimStatus {ready} {error} {slow} />
+			{#if ready}
+				<p class="pointer-events-none absolute bottom-2 left-3 text-[11px] text-muted">Drag to turn the sphere</p>
+				<button
+					class="btn absolute bottom-2 right-2 px-2 py-0.5 text-[11px]"
+					onpointerdown={(e) => e.stopPropagation()}
+					onclick={() => sim.patch({ az: DEFAULTS.az, el: DEFAULTS.el })}>Reset view</button
+				>
+			{/if}
 		</div>
 		<div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted">
 			<span class="flex items-center gap-1.5"
@@ -152,14 +201,14 @@
 			<h2 class="text-sm font-semibold">Gates</h2>
 			<div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quantum gates">
 				{#each GATES as g (g.id)}
-					<button class="btn min-w-10 justify-center" disabled={!ready} onclick={() => apply(g.id, g.code, g.label)}>
+					<button class="btn min-w-10 justify-center" disabled={!ready || full} onclick={() => apply(g.id, g.code)}>
 						{g.label}{g.id.startsWith('R') ? `(${params.angle}°)` : ''}
 					</button>
 				{/each}
 			</div>
 			<p class="mt-3 text-xs text-muted">Circuit so far:</p>
 			<p class="readout mt-0.5 min-h-6 break-words text-sm" aria-live="polite">
-				{history.length > 0 ? history.join(' → ') : 'none yet'}{busy ? ' …' : ''}
+				{steps.length > 0 ? steps.map((s) => s.label).join(' → ') : 'none yet'}{busy ? ' …' : ''}
 			</p>
 		</div>
 
