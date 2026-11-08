@@ -49,6 +49,8 @@ Gravity pulls the bob down, but only the part along the arc moves it. When the b
 
 A spring keeps pulling harder the further you stretch it. A pendulum does not. So for large angles the restoring pull is weaker than the spring-like estimate, the motion is slower, and the swing takes longer.
 
+**Phase space** shows all of this at once. Plot the angle across and the angular speed up. A small swing traces an ellipse around the bottom. A bigger swing traces a stretched loop, because the bob lingers near the ends of its swing, where it is slow. One special loop just reaches the top, where the bob arrives with no speed left and, in theory, takes forever to get there. That curve is the **separatrix**. Inside it the pendulum swings back and forth. Outside it the curves never close, because the bob goes right round, again and again.
+
 ## The math
 
 Writing the angle as $\theta$ and using Newton's second law around the pivot:
@@ -59,7 +61,17 @@ For small angles $\sin\theta \approx \theta$, and this is simple harmonic motion
 
 $$T = T_0\,\frac{2}{\pi}K\!\left(\sin\frac{\theta_0}{2}\right) \approx T_0\left(1 + \frac{\theta_0^2}{16}\right)$$
 
-where $K$ is a standard function (the complete elliptic integral). The approximation works well up to about $60^\circ$. The total energy per unit mass is
+where $K$ is a standard function (the complete elliptic integral). The approximation works well up to about $60^\circ$ and then fails. Here is how much longer one swing takes than $T_0$, exactly and by the estimate:
+
+- $10^\circ$: $1.002$ exactly, $1.002$ by the estimate
+- $30^\circ$: $1.017$ and $1.017$
+- $60^\circ$: $1.073$ and $1.069$
+- $90^\circ$: $1.180$ and $1.154$
+- $120^\circ$: $1.373$ and $1.274$
+- $150^\circ$: $1.762$ and $1.428$
+- $170^\circ$: $2.439$ and $1.550$
+
+The total energy per unit mass is
 
 $$E = \tfrac12 L^2\dot{\theta}^2 + gL(1-\cos\theta)$$
 
@@ -111,4 +123,4 @@ $1.373 \times 2.094 = 2.875\ \text{s}$.
 
 ## Where this shows up in the lab
 
-Open the pendulum lab with the small-swing frequency $\omega_0 = 3\ \text{rad/s}$ and a start angle of $120^\circ$. The page shows the exact period, 2.875 s, next to the small-swing value, 2.094 s. Switch to phase space to see the loop stretched out of its small-swing ellipse. Then set the start angle to $0^\circ$ and raise the start speed past $6\ \text{rad/s}$: the closed loop opens into a spinning track. The curve that separates the two is the separatrix.
+Open the pendulum lab with the small-swing frequency $\omega_0 = 3\ \text{rad/s}$ and a start angle of $120^\circ$. The page shows the exact period, 2.875 s, next to the small-swing value, 2.094 s. Switch to phase space to see the loop stretched out of its small-swing ellipse. Then set the start angle to its smallest value, $5^\circ$, and raise the start speed past $6\ \text{rad/s}$: the closed loop opens into a spinning track. The curve that separates the two is the separatrix.

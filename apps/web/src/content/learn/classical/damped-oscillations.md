@@ -47,7 +47,7 @@ A real swing slows down, a plucked string goes quiet, and a car stops bouncing a
 
 Think of the mass on a spring dipped in honey. The honey pushes back against the motion, and the faster the mass moves, the harder it pushes.
 
-With a little honey, the mass still swings, but each swing is a bit smaller than the last. That is **underdamped**. With a lot of honey, the mass cannot even complete one swing. It oozes back to the middle slowly. That is **overdamped**. Somewhere between lies a sweet spot, where the mass returns to the middle as fast as it can without crossing it. That is **critical damping**, and it is what a good car suspension or a door closer aims for.
+With a little honey, the mass still swings, but each swing is a bit smaller than the last. That is **underdamped**. With a lot of honey, the mass cannot even complete one swing. It oozes back to the middle slowly. That is **overdamped**. Somewhere between lies a sweet spot, where the mass returns to the middle as fast as it can without crossing it. That is **critical damping**, and it is what a door closer or the needle of a measuring instrument aims for. A car's suspension is different. It is deliberately underdamped, with a damping ratio usually well below 1, because critical damping would make the ride harsh. Engineers choose the regime to suit the job.
 
 ## The math
 

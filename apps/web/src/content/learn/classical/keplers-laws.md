@@ -42,7 +42,7 @@ questions:
 
 ## The big picture
 
-Before telescopes could see more than a few moons, Johannes Kepler found three rules that describe every planet. They also describe comets, moons and satellites, because all of them move under the same kind of force. By the end you will be able to find an orbit's period from its size, and the speed at its closest and farthest points.
+In the early 1600s Johannes Kepler studied Tycho Brahe's careful naked-eye measurements of Mars and found three rules that fit them. The rules turned out to describe every planet, and also comets, moons and satellites, because all of them move under the same kind of force: gravity that weakens with the square of the distance. By the end you will be able to find an orbit's period from its size, and the speed at its closest and farthest points.
 
 ## Build the intuition
 
@@ -60,7 +60,13 @@ Kepler's three laws, written with the semi-major axis $a$ (half the long width o
 
 $$T^2 = \frac{4\pi^2}{GM}\,a^3$$
 
-Using years for $T$ and AU for $a$ around the Sun, the constants cancel and $T^2 = a^3$.
+Using years for $T$ and AU for $a$ around the Sun, the constants cancel and $T^2 = a^3$. (The exact law uses the sum of the two masses. For a planet, the difference is far below 1%.)
+
+The speed at any distance $r$ follows from energy conservation, a result called the **vis-viva equation**:
+
+$$v^2 = GM\left(\frac{2}{r} - \frac{1}{a}\right)$$
+
+It says the speed depends only on how far away the planet is and on the size $a$ of its orbit, not on which way it is heading. Putting in $r_p$ and $r_a$ gives the same speed ratio as the angular-momentum argument below.
 
 At perihelion and aphelion the velocity is perpendicular to the radius, so angular momentum conservation gives $r_p v_p = r_a v_a$. For an orbit with eccentricity $e$ the distances are $r_p = a(1-e)$ and $r_a = a(1+e)$. Dividing, the speed ratio is
 
@@ -81,8 +87,9 @@ Mars has $a = 1.524\ \text{AU}$ and $e = 0.0934$.
 - Closest approach: $r_p = 1.524 \times (1 - 0.0934) = 1.382\ \text{AU}$.
 - Farthest distance: $r_a = 1.524 \times (1 + 0.0934) = 1.666\ \text{AU}$.
 - Speed ratio: $v_p/v_a = 1.0934/0.9066 = 1.206$.
+- Actual speeds, from the vis-viva equation with $GM = 4\pi^2$ in AU and years: $v_p = 5.59\ \text{AU/yr} = 26.5\ \text{km/s}$ and $v_a = 4.63\ \text{AU/yr} = 22.0\ \text{km/s}$.
 
-**Check.** The ratio of distances, $1.666/1.382 = 1.206$, agrees with the ratio of speeds, as angular momentum conservation requires. Mars is moving about 21% faster at its closest point.
+**Check.** The ratio of distances, $1.666/1.382 = 1.206$, agrees with the ratio of speeds, as angular momentum conservation requires, and the ratio of the two vis-viva speeds is the same 1.206. Mars is moving about 21% faster at its closest point.
 
 ## Try one yourself
 

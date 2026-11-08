@@ -485,6 +485,85 @@ describe('numbers in lessons are verified', () => {
 		expect((k * k) / 2).toBeCloseTo(0.845, 12);
 	});
 
+	it('the added explanations state correct numbers', () => {
+		// describing-motion: area under a steady 10 m/s for 4 s
+		expect(10 * 4).toBe(40);
+		// projectile-motion: the trajectory equation lands at R, peaks at R/2 with height H
+		const v0 = 20;
+		const th = (30 * Math.PI) / 180;
+		const y = (x: number) => x * Math.tan(th) - (G * x * x) / (2 * v0 ** 2 * Math.cos(th) ** 2);
+		const R = (v0 ** 2 * Math.sin(2 * th)) / G;
+		expect(Math.abs(y(R))).toBeLessThan(1e-9);
+		expect(y(R / 2)).toBeCloseTo((v0 ** 2 * Math.sin(th) ** 2) / (2 * G), 9);
+		expect(y(R / 2 + 3)).toBeCloseTo(y(R / 2 - 3), 9);
+		// pendulum: the table of exact and approximate period factors
+		const table: [number, number, number][] = [
+			[10, 1.002, 1.002],
+			[30, 1.017, 1.017],
+			[60, 1.073, 1.069],
+			[90, 1.18, 1.154],
+			[120, 1.373, 1.274],
+			[150, 1.762, 1.428],
+			[170, 2.439, 1.55]
+		];
+		for (const [deg, exactFactor, approx] of table) {
+			expect(periodFactor(deg)).toBeCloseTo(exactFactor, 3);
+			expect(1 + ((deg * Math.PI) / 180) ** 2 / 16).toBeCloseTo(approx, 3);
+		}
+		// resonance: phase lag and the width of the peak (m = 1, k = 100, b = 1)
+		const amp = (w: number) => 1 / Math.hypot(100 - w * w, 2 * 0.05 * 10 * w);
+		const phase = (w: number) => (Math.atan2(2 * 0.05 * 10 * w, 100 - w * w) * 180) / Math.PI;
+		expect(phase(5)).toBeCloseTo(3.8, 1);
+		expect(phase(10)).toBeCloseTo(90, 10);
+		expect(phase(20)).toBeCloseTo(176.2, 1);
+		const peak = amp(10 * Math.sqrt(1 - 2 * 0.05 ** 2));
+		const crossing = (lo: number, hi: number) => {
+			for (let i = 0; i < 80; i++) {
+				const mid = (lo + hi) / 2;
+				if (amp(mid) > peak / Math.SQRT2 === amp(lo) > peak / Math.SQRT2) lo = mid;
+				else hi = mid;
+			}
+			return (lo + hi) / 2;
+		};
+		const left = crossing(8, 10);
+		const right = crossing(10, 12);
+		expect(left).toBeCloseTo(9.46, 2);
+		expect(right).toBeCloseTo(10.46, 2);
+		expect(right - left).toBeCloseTo(1.0, 2);
+		expect(1 / Math.SQRT2).toBeCloseTo(0.71, 2);
+		// kepler: vis-viva for Mars, with GM = 4π² in AU and years
+		const GM = 4 * Math.PI ** 2;
+		const a = 1.524;
+		const e = 0.0934;
+		const vp = Math.sqrt(GM * (2 / (a * (1 - e)) - 1 / a));
+		const va = Math.sqrt(GM * (2 / (a * (1 + e)) - 1 / a));
+		expect(vp).toBeCloseTo(5.59, 2);
+		expect(va).toBeCloseTo(4.63, 2);
+		expect(vp / va).toBeCloseTo((1 + e) / (1 - e), 12);
+		expect(vp * 4.74047).toBeCloseTo(26.5, 1);
+		expect(va * 4.74047).toBeCloseTo(22.0, 1);
+		// a planet 0.1% of the Sun's mass changes the period by under 0.1%
+		expect(Math.sqrt(1 / 1.001) - 1).toBeGreaterThan(-0.001);
+		// coupled-oscillators: the small-k, long-chain limit is proportional to k
+		const wk = (k: number, n: number) => 2 * Math.sin((k * Math.PI) / (2 * (n + 1)));
+		expect(wk(1, 99) / ((1 * Math.PI) / 100)).toBeCloseTo(1, 4);
+		expect(wk(3, 99) / wk(1, 99)).toBeCloseTo(3, 2);
+		// bloch-sphere: measuring along x and y for the H, T, H state
+		expect((1 + 0) / 2).toBe(0.5);
+		expect((1 - Math.SQRT1_2) / 2).toBeCloseTo(0.146, 3);
+		// decoherence: gate count in the illustration
+		expect(50e-6 / 50e-9).toBeCloseTo(1000, 6);
+		// schrodinger: box levels and the level a k0 = 1 packet sits near
+		const level = (n: number, w: number) => (n * Math.PI) ** 2 / (2 * w * w);
+		expect(level(1, 4)).toBeCloseTo(0.308, 3);
+		expect(level(2, 4)).toBeCloseTo(1.234, 3);
+		expect(level(3, 4)).toBeCloseTo(2.776, 3);
+		expect((30 * 1) / Math.PI).toBeCloseTo(9.55, 2);
+		// group speed of ω = k²/2 is k
+		const w = (k: number) => (k * k) / 2;
+		expect((w(1.5 + 1e-6) - w(1.5 - 1e-6)) / 2e-6).toBeCloseTo(1.5, 6);
+	});
+
 	it('projectile-motion worked example, faded example and notebook cross-reference', () => {
 		const rad = (d: number) => (d * Math.PI) / 180;
 		// worked example: 20 m/s at 30°

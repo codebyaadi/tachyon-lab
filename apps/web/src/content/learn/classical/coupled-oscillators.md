@@ -59,6 +59,10 @@ Here $u_j$ is the displacement of mass $j$, and $\omega_0 = \sqrt{k_s/m}$ is set
 
 $$u_1 = A\cos\frac{\Delta t}{2}\cos\frac{\Sigma t}{2}, \qquad \Delta = \omega_2 - \omega_1,\ \ \Sigma = \omega_1 + \omega_2$$
 
+To find the modes yourself, guess that every mass swings at one shared frequency, $u_j = A_j\cos\omega t$, and put that into Newton's law for each mass. The unknown $\omega^2$ then appears as an eigenvalue of a small matrix, and each eigenvector is a mode shape. That is why the tests check the formula above against an eigenvalue solver.
+
+Add more masses and the modes crowd together. For a long chain and small $k$, $\omega_k \approx \omega_0\,k\pi/(N+1)$: the frequency is proportional to $k$, which is the signature of waves. A very long chain of masses and springs behaves like a vibrating string.
+
 The factor $\cos(\Delta t/2)$ is a slow envelope. The energy has moved completely to the second mass when the envelope reaches zero, after a time $t = \pi/\Delta$.
 
 <details>

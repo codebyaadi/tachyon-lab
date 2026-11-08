@@ -57,6 +57,10 @@ It is always larger, by a fixed factor each step. Semi-implicit Euler uses the n
 
 $$\text{error} \propto dt^{p}, \qquad p = 1 \text{ (Euler)},\ 2 \text{ (Verlet)},\ 4 \text{ (RK4)}$$
 
+Accuracy costs work. Euler, semi-implicit Euler and velocity Verlet each need the force once per step. RK4 needs it four times, because it samples the direction at four places within the step. That extra work buys a much smaller error per step, but it does not make the energy error bounded.
+
+A symplectic method such as semi-implicit Euler or Verlet does not follow the true energy exactly. It follows a slightly different energy exactly. The true energy wobbles around that one, and the wobble is the gap between the two, which is why it stays in a narrow band instead of growing.
+
 <details>
 <summary>Why does this step follow? Why is the factor exactly 1 + ω²dt²</summary>
 

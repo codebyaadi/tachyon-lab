@@ -48,6 +48,8 @@ Picture a car trip. The **odometer** tells you how far you have gone: that is **
 
 On a graph of position against time, velocity is the **steepness** of the line: a steep line means fast, a flat line means standing still. On a graph of velocity against time, acceleration is the steepness. Braking is acceleration too. It just points opposite to the direction you are moving.
 
+The velocity graph has a second use: the **area** under it is the distance travelled. A car holding a steady 10 m/s for 4 s sweeps out a rectangle 10 tall and 4 wide, an area of 40 m. If the speed changes evenly, the area is a triangle or a trapezoid instead, and that picture is where the average-velocity shortcut in the next section comes from. Steepness gives you the rate of change, and area gives you the total change.
+
 ## The math
 
 Measure position $x$ (in metres, m) along a straight line, and time $t$ (in seconds, s).

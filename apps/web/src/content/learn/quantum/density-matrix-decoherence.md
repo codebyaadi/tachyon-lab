@@ -48,6 +48,10 @@ There are two different ways to lose a state. In the first, the qubit loses ener
 
 On the Bloch sphere, relaxation lowers the arrow toward the north pole. Dephasing shortens the arrow's horizontal part. Either one pulls the arrow inside the sphere, and a point inside is a **mixed state**, a blend of possibilities that is less quantum than a state on the surface.
 
+A coin gives a good picture of the centre of the sphere. A qubit at the centre is just a fair coin toss, with no quantum superposition left in it. A qubit on the surface is more like a coin that is balanced on its edge in a definite way. Moving inward means losing track of which definite state you have.
+
+This is why decoherence is the central problem of quantum computing. A gate takes time, and the qubit has only about $T_2$ before its phase is gone. As an illustration, if a gate took $50\ \text{ns}$ and $T_2$ were $50\ \mu\text{s}$, you could run about $50\,\mu\text{s}/50\,\text{ns} = 1000$ gates before the state was badly spoiled. Longer-lived qubits and faster gates both help.
+
 ## The math
 
 A state with Bloch vector $\mathbf r$ has the density matrix $\rho = \tfrac12(I + \mathbf r\cdot\boldsymbol\sigma)$. Noise acts on $\mathbf r$ simply:

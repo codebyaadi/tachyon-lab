@@ -45,7 +45,9 @@ A classical bit is 0 or 1. A **qubit** is the smallest quantum system, and its s
 
 Picture a globe. The north pole is $|0\rangle$ and the south pole is $|1\rangle$. Every other point on the surface is a superposition. Its height sets how likely each outcome is, and its longitude is a **phase**, a hidden angle that matters when gates are applied later.
 
-A gate turns the whole globe about an axis. **X** flips it over the $x$ axis, so north goes to south. **H** turns the north pole onto the equator. **S** and **T** turn it about the vertical axis, which moves a point round its latitude and changes only the phase. Measurement only reads the height.
+A gate turns the whole globe about an axis. **X** flips it over the $x$ axis, so north goes to south. **H** turns the north pole onto the equator. **S** and **T** turn it about the vertical axis, which moves a point round its latitude and changes only the phase. The usual 0-or-1 measurement only reads the height. You can also measure along the other two axes. That asks a different question, and the chances then depend on $x$ or $y$ in the same way.
+
+Two points are easy to miss. First, opposite points on the sphere are the states that can be told apart perfectly: $|0\rangle$ and $|1\rangle$ at the poles, $|+\rangle$ and $|-\rangle$ on the $x$ axis. Second, the sphere leaves out one thing, a global phase that multiplies the whole state. No measurement can ever see it, so it is not part of the picture.
 
 ## The math
 
@@ -78,6 +80,7 @@ Start in $|0\rangle$, so $\mathbf{r} = (0, 0, 1)$, and apply the sequence H, T, 
 - After T, a $45^\circ$ turn about $z$: $\mathbf{r} = (0.707, 0.707, 0)$.
 - After the second H, using $(x, y, z) \to (z, -y, x)$: $\mathbf{r} = (0, -0.707, 0.707)$.
 - Measurement chance: $P(0) = (1 + 0.707)/2 = 0.854$.
+- Measuring along the other two axes works the same way with $x$ and $y$: $P(+) = (1+x)/2 = 0.5$ and $P(+i) = (1+y)/2 = 0.146$.
 
 **Check.** The state is again a point on the sphere, since $0.707^2 + 0.707^2 = 1$. The exact value is $\cos^2(\pi/8) = 0.854$, which agrees.
 

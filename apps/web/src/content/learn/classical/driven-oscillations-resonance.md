@@ -62,7 +62,13 @@ Look at the two terms under the root. Far from resonance the first one dominates
 
 $$A(\omega_0) = \frac{F}{b\,\omega_0}, \qquad \frac{A(\omega_0)}{F/k} = \frac{1}{2\zeta} = Q$$
 
-The number $Q$, the **quality factor**, says how many times larger the response is than a steady push of the same strength. The peak is about $\omega_0/Q$ wide.
+The number $Q$, the **quality factor**, says how many times larger the response is than a steady push of the same strength. The peak is about $\omega_0/Q$ wide, so a high $Q$ gives a tall, narrow peak. A radio tuner uses exactly this: a high-$Q$ circuit answers strongly to one station's frequency and ignores its neighbours.
+
+The motion also lags behind the push by a phase $\varphi$:
+
+$$\tan\varphi = \frac{2\zeta\omega_0\omega_d}{\omega_0^2 - \omega_d^2}$$
+
+Well below resonance the mass keeps pace with the push, so $\varphi$ is near $0^\circ$. At resonance it lags by exactly a quarter of a cycle, $90^\circ$. That is the timing at which the push is always in step with the velocity, so it does positive work all the time. Well above resonance the mass moves opposite to the push, and $\varphi$ is near $180^\circ$.
 
 <details>
 <summary>Why does this step follow? Why does the amplitude at resonance equal F/(bω₀)</summary>
@@ -80,8 +86,10 @@ Take $m = 1\ \text{kg}$, $k = 100\ \text{N/m}$, $b = 1\ \text{kg/s}$ and $F = 2\
 - At resonance: $A = F/(b\omega_0) = 2/10 = 0.2\ \text{m}$.
 - Quality factor: $Q = 1/(2 \times 0.05) = 10$, and $0.2/0.02 = 10$.
 - At half the natural frequency, $\omega_d = 5\ \text{rad/s}$: the root is $\sqrt{75^2 + 5^2} = 75.2$, so $A = 2/75.2 = 0.027\ \text{m}$.
+- Width of the peak: the response falls to 71% of its top (half the energy) at $9.46$ and $10.46\ \text{rad/s}$, a width of $1.0\ \text{rad/s}$, which is $\omega_0/Q = 10/10$.
+- Phase lag: $4^\circ$ at $\omega_d = 5$, exactly $90^\circ$ at $\omega_d = 10$, and $176^\circ$ at $\omega_d = 20$.
 
-**Check.** The two ways of finding $Q$ agree. Moving the drive away from resonance cuts the response from 0.2 m to 0.027 m, nearly eight times smaller.
+**Check.** The two ways of finding $Q$ agree. Moving the drive away from resonance cuts the response from 0.2 m to 0.027 m, nearly eight times smaller. The measured width of the peak matches $\omega_0/Q$.
 
 ## Try one yourself
 

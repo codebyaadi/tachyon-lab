@@ -84,6 +84,12 @@ $$R = \frac{v_0^2 \sin 2\theta}{g}$$
 
 The range is largest when $\sin 2\theta = 1$, that is at $\theta = 45^\circ$.
 
+**The shape of the path.** Solve $x = v_{x0}t$ for $t$ and put it into the equation for $y$ to remove time:
+
+$$y = x\tan\theta - \frac{g\,x^2}{2v_0^2\cos^2\theta}$$
+
+This is a straight line, $x\tan\theta$, pulled down by a term that grows as $x^2$. That is the equation of a **parabola**. It is symmetric: the top is exactly halfway along the range, at $x = R/2$, and on level ground the ball comes down at the same angle and the same speed it went up with.
+
 <details>
 <summary>Why does θ and 90° − θ give the same range?</summary>
 

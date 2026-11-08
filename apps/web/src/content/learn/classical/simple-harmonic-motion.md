@@ -47,7 +47,11 @@ Push a child on a swing, pluck a guitar string, or watch a weight bob on a sprin
 
 Hold a mass on a spring and pull it to one side. The spring pulls back, harder the further you pulled. Let go, and the mass speeds up toward the middle. At the middle the spring pulls with no force at all, but the mass is moving, so it carries on past. Now the spring pulls the other way, slows it, stops it, and sends it back.
 
-The key rule is that **the pull is proportional to the distance from the middle**. Twice as far, twice the pull. That one rule produces a motion whose rhythm does not depend on how far you start, which is why a grandfather clock keeps good time even as its swing slowly shrinks.
+The key rule is that **the pull is proportional to the distance from the middle**. Twice as far, twice the pull. That one rule produces a motion whose rhythm does not depend on how far you start. This is why a pendulum clock (whose small swings behave the same way) keeps good time even as its swing slowly shrinks.
+
+Energy tells the same story. At the ends of the swing the mass is momentarily still and all the energy is stored in the stretched spring. At the middle the spring is relaxed and all the energy is motion. In between it is shared, and the total never changes, because nothing here takes energy away.
+
+This pattern is far more general than springs. Near the bottom of almost any smooth dip in a potential energy curve, the restoring force is very nearly proportional to the distance from the bottom. A small push on a marble in a bowl, on an atom in a crystal or on a molecule's bond therefore gives the same equation.
 
 ## The math
 

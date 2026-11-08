@@ -59,9 +59,15 @@ In one dimension, with a potential energy $V(x)$:
 
 $$i\hbar\,\frac{\partial\psi}{\partial t} = -\frac{\hbar^2}{2m}\frac{\partial^2\psi}{\partial x^2} + V(x)\,\psi$$
 
-The lab uses units where $\hbar = m = 1$. A plane wave $e^{i(kx - \omega t)}$ solves the free equation when $\omega = \hbar k^2/2m$, so a wave of wave number $k$ moves at speed $\hbar k/m$ and has energy $\hbar^2k^2/2m$. A Gaussian packet of width $\sigma$ centred at $x_0$ with mean wave number $k_0$ keeps its centre at $x_0 + k_0 t$, but its width grows:
+The lab uses units where $\hbar = m = 1$. A plane wave $e^{i(kx - \omega t)}$ solves the free equation when $\omega = \hbar k^2/2m$. It has energy $\hbar^2k^2/2m$, and a packet built from waves near $k$ moves at the **group speed** $d\omega/dk = \hbar k/m$, which is the speed of the particle. A Gaussian packet of width $\sigma$ centred at $x_0$ with mean wave number $k_0$ keeps its centre at $x_0 + k_0 t$, but its width grows:
 
 $$\sigma(t) = \sigma\sqrt{1 + \left(\frac{\hbar t}{2m\sigma^2}\right)^2}, \qquad \sigma_x\sigma_p \ge \frac{\hbar}{2}$$
+
+A particle trapped in a box of width $a$ can only have certain energies. The wavefunction must fit inside, so its energy levels are
+
+$$E_n = \frac{n^2\pi^2\hbar^2}{2ma^2}, \qquad n = 1, 2, 3, \dots$$
+
+For $a = 4$ and $\hbar = m = 1$ the first three are $0.308$, $1.234$ and $2.776$. A packet is a mixture of these levels. In a box of width 30, a packet with $k_0 = 1$ is centred near level $n = ak_0/\pi \approx 10$.
 
 For a barrier of height $V_0$ and width $a$, and a wave with energy $E < V_0$, the chance of getting through is
 
@@ -109,7 +115,7 @@ The product is $3.61 \times 0.167 = 0.60$, above $\tfrac12$ because the packet h
 ## Common mistakes
 
 - **Treating ψ as a probability.** The probability density is $|\psi|^2$, and the wavefunction itself can be negative or complex.
-- **Picturing the particle as a small ball inside the packet.** Before it is measured, the packet is the whole description.
+- **Picturing a small ball hiding somewhere inside the packet.** The packet is the complete description. It says where the particle is likely to be found, not where a hidden ball already sits.
 - **Expecting tunnelling to cost energy.** The average energy stays 0.5 in the lab. Nothing climbs the barrier.
 - **Thinking a narrow packet is a good approximation of a single wave.** It is a wide mix of wave numbers, and that is why it spreads.
 
