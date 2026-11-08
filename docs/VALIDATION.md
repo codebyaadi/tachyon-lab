@@ -47,11 +47,14 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | 1D wavefunction              | FD eigen     | Harmonic-oscillator energies Eₙ = (n + ½)ħω, n ≤ 10                | rel. error < 1e-4                                      | 🔜     |
 | 1D wavefunction              | FD eigen     | Infinite-well energies, n ≤ 10                                     | rel. error < 1e-4                                      | 🔜     |
 | 1D wavefunction              | Scattering   | Numerical T vs momentum-averaged analytic T, rectangular barrier   | abs. error < 0.01                                      | 🔜     |
-| Qubit & Bloch sphere         | Matrix       | Gate identities (H² = I, HZH = X, S² = Z, T² = S)                  | error < 1e-12                                          | 🔜     |
-| Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under decoherence       | trace error < 1e-12; eigenvalues ≥ −1e-12              | 🔜     |
+| Qubit & Bloch sphere         | Matrix       | Gate identities (H² = I, HZH = X, HXH = Z, S² = Z, T² = S, XY = iZ) | error < 1e-12                                       | ✅     |
+| Qubit & Bloch sphere         | Matrix       | Every gate's matrix agrees with its rotation of the Bloch sphere (up to global phase) | error < 1e-12                          | ✅     |
+| Qubit & Bloch sphere         | Matrix       | Pure states stay pure (|r| = 1) through 200 gates; H·T·H gives P(0) = cos²(π/8) | error < 1e-12                          | ✅     |
+| Qubit & Bloch sphere         | Kraus        | ρ stays positive semidefinite with trace 1 under 3000 steps of mixed noise and gates | trace error < 1e-12; eigenvalues ≥ −1e-12  | ✅     |
+| Qubit & Bloch sphere         | Kraus        | Population relaxes as e^(−t/T₁) and coherence as e^(−t/T₂), whatever the step | abs. error < 1e-12                          | ✅     |
 | Two-level systems            | ODE          | Rabi populations vs the generalized Rabi formula                   | abs. error < 1e-6                                      | 🔜     |
 
-The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs`, `crates/physics/src/coupled.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
+The implemented rows live in `crates/physics/src/ode/tests.rs`, `crates/physics/src/projectile.rs`, `crates/physics/src/oscillator.rs`, `crates/physics/src/kepler.rs`, `crates/physics/src/pendulum.rs`, `crates/physics/src/coupled.rs`, `crates/physics/src/qubit.rs` and the `physics-wasm` simulation tests. Run them with `cargo test --workspace`.
 
 ## Lesson accuracy
 

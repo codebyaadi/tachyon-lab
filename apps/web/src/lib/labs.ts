@@ -51,6 +51,12 @@ export const LABS: LabInfo[] = [
 		lessons: []
 	},
 	{
+		href: '/lab/qubit',
+		title: 'The qubit and the Bloch sphere',
+		blurb: 'Turn a qubit with quantum gates, then switch on noise and watch its state decay.',
+		lessons: []
+	},
+	{
 		href: '/lab/decay',
 		title: 'Exponential decay',
 		blurb: 'Euler vs RK4 against the exact solution. Watch an integrator go unstable.',

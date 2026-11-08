@@ -36,7 +36,7 @@ export type SimHostOptions<P extends ParamValues> = {
  * Call it once, while a page component is initialising. A Comlink proxy is kept in a plain
  * variable, never in `$state`: Svelte would probe it and every probe becomes a worker call.
  */
-export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
+export function createSimHost<P extends ParamValues, X extends object = object>(opts: SimHostOptions<P>) {
 	let params = $state<P>({ ...opts.defaults });
 	let readouts = $state<Float64Array<ArrayBufferLike>>(new Float64Array(opts.readoutLen));
 	let ready = $state(false);
@@ -151,6 +151,14 @@ export function createSimHost<P extends ParamValues>(opts: SimHostOptions<P>) {
 			void api?.setParams(snapshot());
 			clearTimeout(hashTimer);
 			hashTimer = setTimeout(writeHash, 150);
+		},
+		/**
+		 * Call an extra method the worker exposes beyond the standard ones (for example "apply this gate").
+		 * `X` describes those extra methods, so the name and arguments are type-checked.
+		 */
+		command<K extends keyof X & string>(name: K, ...args: X[K] extends (...a: infer A) => unknown ? A : never) {
+			const fn = (api as unknown as Record<string, ((...a: unknown[]) => unknown) | undefined> | undefined)?.[name];
+			void fn?.(...args);
 		},
 		play: () => void api?.play(),
 		pause: () => void api?.pause(),
