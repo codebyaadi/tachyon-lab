@@ -2,7 +2,8 @@
  * Tests over the real lesson files. A lesson that breaks the standard in docs/CURRICULUM.md,
  * has broken LaTeX, or states a wrong number fails here, so it cannot ship.
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vite-plus/test';
 import { loadLessonSources } from './content.server';
@@ -36,6 +37,20 @@ describe('lesson files', () => {
 			];
 			for (const t of text) await expect(renderMarkdown(t), lessonId(l)).resolves.toBeTruthy();
 		}
+	});
+});
+
+describe('KaTeX markup and stylesheet', () => {
+	it('come from the same version, so fractions and subscripts lay out correctly', async () => {
+		// rehype-katex renders the lesson HTML with its own copy of katex. If the app's katex (which
+		// supplies the stylesheet and renders the lab equations) is a different version, class names
+		// differ and equations render with colliding fractions and full-size subscripts.
+		const require = createRequire(import.meta.url);
+		const css = readFileSync(require.resolve('katex/dist/katex.min.css'), 'utf8');
+		const html = await renderMarkdown(String.raw`$x_0 = \frac{1}{2}$`);
+		const sizing = html.match(/class="((?:katex-)?sizing) reset-size/)?.[1];
+		expect(sizing, 'no sizing class found in the rendered equation').toBeDefined();
+		expect(css).toContain(`.${sizing}.reset-size`);
 	});
 });
 
