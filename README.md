@@ -2,6 +2,8 @@
 
 **Learn classical and quantum mechanics by running the experiment.** Tachyon Lab is a free, open-source web lab of interactive, physically correct simulations, paired with plain-language theory lessons. It runs entirely in your browser: no accounts, no server.
 
+**Live site: [tachyon-lab.pages.dev](https://tachyon-lab.pages.dev)**
+
 > **Status: early.** The foundations work end to end (a Rust/WebAssembly solver, a GPU plot, shareable links, a lesson system), with one simulation and two draft lessons so far. The rest is planned and documented. See [Status](#status).
 
 ## The idea
