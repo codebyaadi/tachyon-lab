@@ -13,6 +13,10 @@ export type QubitParams = {
 	el: number;
 	/** The gates applied so far, written like "H.T.Rx90.H" (see circuit.ts). */
 	circuit: string;
+	/** Wire-frame sphere, or a lit, shaded ball. */
+	look: 'lines' | 'shaded';
+	/** Whether the sphere keeps turning for a moment after you let go. */
+	feel: 'direct' | 'momentum';
 };
 
 /** The most gates a circuit may hold (a shared link cannot make the page replay thousands). */
@@ -30,7 +34,9 @@ export const DEFAULTS: QubitParams = {
 	angle: 90,
 	az: 35,
 	el: 20,
-	circuit: ''
+	circuit: '',
+	look: 'lines',
+	feel: 'direct'
 };
 
 export const SPECS: ParamSpec[] = [
@@ -95,6 +101,24 @@ export const SPECS: ParamSpec[] = [
 		step: 0.1,
 		unit: '×',
 		help: 'Run noise faster or slower than the clock.'
+	},
+	{
+		kind: 'choice',
+		key: 'look',
+		label: 'Sphere style',
+		options: [
+			{ value: 'lines', label: 'Wire frame (clear and light)' },
+			{ value: 'shaded', label: 'Shaded ball (more realistic)' }
+		]
+	},
+	{
+		kind: 'choice',
+		key: 'feel',
+		label: 'Dragging feel',
+		options: [
+			{ value: 'direct', label: 'Direct: stops when you let go' },
+			{ value: 'momentum', label: 'Momentum: keeps turning, then slows' }
+		]
 	},
 	{ kind: 'number', key: 'az', label: 'View: turn around', min: -180, max: 180, step: 5, unit: '°' },
 	{ kind: 'number', key: 'el', label: 'View: tilt', min: -80, max: 80, step: 5, unit: '°' },

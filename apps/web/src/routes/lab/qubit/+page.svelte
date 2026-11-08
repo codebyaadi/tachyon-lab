@@ -80,19 +80,68 @@
 		const wrapped = ((((az + 180) % 360) + 360) % 360) - 180;
 		sim.patch({ az: Math.round(wrapped), el: Math.round(Math.max(-80, Math.min(80, el))) });
 	};
+	// "Momentum" feel: after letting go the sphere keeps turning and slows down smoothly.
+	let spin = { az: 0, el: 0 };
+	let last = { x: 0, y: 0, t: 0 };
+	let coast = 0;
+	// The view as the page last asked for it, so a fast coast does not wait for rounded values to come back.
+	let view = { az: DEFAULTS.az, el: DEFAULTS.el };
+	const stopCoast = () => {
+		cancelAnimationFrame(coast);
+		coast = 0;
+	};
+	const turnTo = (az: number, el: number) => {
+		view = { az, el: Math.max(-80, Math.min(80, el)) };
+		turn(view.az, view.el);
+	};
+	function runCoast() {
+		let prev = performance.now();
+		const step = (now: number) => {
+			const dt = Math.min(0.05, (now - prev) / 1000);
+			prev = now;
+			const decay = Math.exp(-3.2 * dt);
+			spin = { az: spin.az * decay, el: spin.el * decay };
+			if (Math.hypot(spin.az, spin.el) < 4) {
+				coast = 0;
+				return;
+			}
+			turnTo(view.az + spin.az * dt, view.el + spin.el * dt);
+			coast = requestAnimationFrame(step);
+		};
+		coast = requestAnimationFrame(step);
+	}
+	$effect(() => stopCoast);
+
 	function onDown(e: PointerEvent) {
 		if (!ready) return;
+		stopCoast();
+		view = { az: params.az, el: params.el };
 		drag = { x: e.clientX, y: e.clientY, az: params.az, el: params.el };
+		last = { x: e.clientX, y: e.clientY, t: performance.now() };
+		spin = { az: 0, el: 0 };
 		host.setPointerCapture(e.pointerId);
 	}
 	function onMove(e: PointerEvent) {
 		if (!drag) return;
 		// On a touch screen only sideways drags turn it, so the page can still scroll.
 		const dy = e.pointerType === 'touch' ? 0 : e.clientY - drag.y;
-		turn(drag.az + (e.clientX - drag.x) * 0.5, drag.el + dy * 0.5);
+		turnTo(drag.az + (e.clientX - drag.x) * 0.5, drag.el + dy * 0.5);
+		const now = performance.now();
+		const dt = (now - last.t) / 1000;
+		if (dt > 0.004) {
+			// Smoothed speed in degrees per second.
+			const vAz = ((e.clientX - last.x) * 0.5) / dt;
+			const vEl = e.pointerType === 'touch' ? 0 : ((e.clientY - last.y) * 0.5) / dt;
+			spin = { az: spin.az * 0.4 + vAz * 0.6, el: spin.el * 0.4 + vEl * 0.6 };
+			last = { x: e.clientX, y: e.clientY, t: now };
+		}
 	}
 	function onUp() {
+		if (!drag) return;
 		drag = undefined;
+		// Only a fling coasts: if the pointer rested before release the speed is stale.
+		const resting = performance.now() - last.t > 80;
+		if (params.feel === 'momentum' && !resting && Math.hypot(spin.az, spin.el) > 20) runCoast();
 	}
 	function onKey(e: KeyboardEvent) {
 		const step = e.shiftKey ? 15 : 5;

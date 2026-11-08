@@ -22,6 +22,7 @@ import {
 	START_CODE
 } from '../modules/qubit/params';
 import { fitCentered } from '../shell/fitRange';
+import { PLOT_PAD } from '../shell/plotLayout';
 import type { PlotColors } from '../shell/plotColors';
 import init, { QubitSim } from '../wasm/pkg/physics_wasm.js';
 import wasmUrl from '../wasm/pkg/physics_wasm_bg.wasm?url';
@@ -35,7 +36,17 @@ const LATITUDES = [Math.PI / 6, -Math.PI / 6];
 let sim: QubitSim | undefined;
 let plot: LinePlot;
 let readouts: Float64Array<ArrayBufferLike> = new Float64Array(READOUT_LEN);
-let colors: { bg: RGBA; grid: RGBA; noisy: RGBA; ideal: RGBA; front: RGBA; back: RGBA; faint: RGBA };
+let colors: {
+	bg: RGBA;
+	grid: RGBA;
+	noisy: RGBA;
+	ideal: RGBA;
+	front: RGBA;
+	back: RGBA;
+	faint: RGBA;
+	rim: RGBA;
+	highlight: RGBA;
+};
 /** The gates applied since the last restart, as circuit tokens. The page's `circuit` parameter mirrors it. */
 let applied: string[] = [];
 let params: QubitParams;
@@ -158,8 +169,42 @@ function clearTrail() {
 	trailHead = 0;
 }
 
+const mix = (a: RGBA, b: RGBA, t: number): RGBA => [
+	a[0] + (b[0] - a[0]) * t,
+	a[1] + (b[1] - a[1]) * t,
+	a[2] + (b[2] - a[2]) * t,
+	1
+];
+
+/**
+ * A lit ball: opaque circles from the rim inward, each a little smaller and shifted toward a light
+ * at the upper left, painted one over the other. Their colours run from the rim shade to a highlight.
+ */
+function drawBall() {
+	const RINGS = 56;
+	const pxPerUnit =
+		Math.min(cssW - (PLOT_PAD.left + PLOT_PAD.right), cssH - (PLOT_PAD.top + PLOT_PAD.bottom)) / (2 * VIEW);
+	const width = Math.max(2, (pxPerUnit / RINGS) * 1.8);
+	const light = [-0.32, 0.36];
+	for (let k = 0; k < RINGS; k++) {
+		const t = k / (RINGS - 1);
+		const r = 1 - 0.97 * t;
+		const cx = light[0] * t * 0.9;
+		const cy = light[1] * t * 0.9;
+		const color = mix(colors.rim, colors.highlight, t ** 1.4);
+		const xs = new Float64Array(65);
+		const ys = new Float64Array(65);
+		for (let i = 0; i <= 64; i++) {
+			xs[i] = cx + r * Math.cos((2 * Math.PI * i) / 64);
+			ys[i] = cy + r * Math.sin((2 * Math.PI * i) / 64);
+		}
+		plot.series(xs, ys, 65, color, width);
+	}
+}
+
 function draw(s: QubitSim) {
 	plot.begin(colors.bg);
+	if (params.look === 'shaded') drawBall();
 	// The far halves of the great circles first, then the axes, so the near halves sit on top.
 	const equator = circle((t) => [Math.cos(t), Math.sin(t), 0]);
 	const meridianX = circle((t) => [Math.cos(t), 0, Math.sin(t)]);
@@ -301,7 +346,15 @@ const api = {
 		dirty = true;
 	},
 	setColors(c: PlotColors) {
+		const bg = hexToRgba(c.bg);
+		const ink = hexToRgba(c.ink);
+		const lightTheme = 0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2] > 0.5;
+		// The ball is a shade of the page colour: a little darker at the rim and lighter at the highlight.
+		const rim = mix(bg, ink, lightTheme ? 0.14 : 0.07);
+		const highlight = lightTheme ? mix(bg, [1, 1, 1, 1], 0.7) : mix(bg, ink, 0.34);
 		colors = {
+			rim,
+			highlight,
 			bg: hexToRgba(c.bg),
 			grid: hexToRgba(c.grid),
 			noisy: hexToRgba(c.numeric),
