@@ -3,6 +3,7 @@
 	import { DEFAULTS, type OrbitParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/orbit/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -165,6 +166,7 @@
 					<strong>Semi-implicit Euler</strong> and <strong>velocity Verlet</strong> keep the loop closed, and both keep the angular momentum exactly. Verlet also places the planet along the loop more accurately. <strong>RK4</strong> is very accurate for a few orbits but slowly
 					loses energy over a long run.
 				</p>
+				<LabLessons href="/lab/orbit" />
 			{:else}
 				<div>{@html eq.accel}</div>
 				<p>Two conserved quantities, per unit mass:</p>

@@ -3,6 +3,7 @@
 	import { DEFAULTS, type DecayParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/decay/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
@@ -92,6 +93,7 @@
 				<p>Something that loses a fixed fraction of itself per unit time decays exponentially: radioactive nuclei, a cooling cup, a discharging capacitor.</p>
 				<p>The computer can't follow the smooth curve exactly. It takes steps of size dt, guessing where the curve goes next. <strong>Euler</strong> uses only the slope at the start of each step, so it keeps overshooting. <strong>RK4</strong> samples the slope four times per step and is far more accurate for the same dt.</p>
 				<p>Make dt large with Euler and watch the numerical curve oscillate, then blow up. That's a numerical instability, not physics.</p>
+				<LabLessons href="/lab/decay" />
 			{:else}
 				<div>{@html eq.ode}</div>
 				<p>Exact solution:</p>

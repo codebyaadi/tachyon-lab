@@ -10,6 +10,7 @@
 	} from '#lib/modules/oscillator/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
@@ -172,6 +173,7 @@
 					Set the drive frequency equal to the natural frequency, with little damping, and watch the swing grow large. That is
 					<strong>resonance</strong>.
 				</p>
+				<LabLessons href="/lab/oscillator" />
 			{:else}
 				<div>{@html eq.ode}</div>
 				<p>Underdamped free motion (ζ &lt; 1, F = 0), the exact answer the simulation is checked against:</p>

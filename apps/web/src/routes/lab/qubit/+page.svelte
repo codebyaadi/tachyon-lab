@@ -13,6 +13,7 @@
 		VERSION
 	} from '#lib/modules/qubit/params.ts';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import { PLOT_PAD } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -307,6 +308,7 @@
 					vertical axis). The arrow moves <em>inside</em> the sphere. That is what a <strong>mixed state</strong> looks like: the
 					nearer the centre, the less quantum the qubit. This decay is the main obstacle to building quantum computers.
 				</p>
+				<LabLessons href="/lab/qubit" />
 			{:else}
 				<div>{@html eq.state}</div>
 				<p>A general state is described by its density matrix, which also covers noisy, mixed states:</p>
