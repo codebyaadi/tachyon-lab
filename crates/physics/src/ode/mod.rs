@@ -3,11 +3,13 @@
 //! A first-order system dy/dt = f(t, y) implements [`System`]. Integrators own
 //! their scratch buffers so stepping never allocates (important at 60 fps).
 
+mod dopri;
 mod euler;
 mod rk4;
 mod semi_implicit;
 mod verlet;
 
+pub use dopri::{DopriError, DormandPrince};
 pub use euler::Euler;
 pub use rk4::Rk4;
 pub use semi_implicit::{SemiImplicitEuler, semi_implicit_euler_step};
