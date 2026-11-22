@@ -110,12 +110,12 @@ $\omega_1 = 5\sqrt{1 - 0.04} = 5 \times 0.980 = 4.90\ \text{rad/s}$.
 
 ## Common mistakes
 
-- **"More damping always settles faster."** Past critical damping it settles more slowly. The best value is exactly $\zeta = 1$.
+- **"More damping always settles faster."** Past critical damping it settles more slowly. The best value is exactly $\zeta = 1$. [See it in the lab](/lab/oscillator?preset=overdamped).
 - **Expecting the swing to stop at once when $\zeta$ is large.** Overdamped motion still takes time, it just never crosses the middle.
 - **Mixing up $\zeta$ and $b$.** $\zeta$ is a ratio and has no units. $b$ is in kg/s. Compare $b$ with $2\sqrt{km}$ to find $\zeta$.
-- **Assuming the energy loss is the same every swing.** It is a fixed fraction, so the amplitude decays exponentially, not in equal steps.
+- **Assuming the energy loss is the same every swing.** It is a fixed fraction, so the amplitude decays exponentially, not in equal steps. [See it in the lab](/lab/oscillator?preset=ringing).
 - **Forgetting the real period is a little longer.** The ringing frequency is $\omega_1$, not $\omega_0$, though for small $\zeta$ they are very close.
 
 ## Where this shows up in the lab
 
-Open the oscillator lab with drive strength $0$ and $\omega_0 = 2\ \text{rad/s}$. Slide the damping ratio $\zeta$ from 0 up to 2 and watch the three behaviours: a ringing swing at $0.1$, the fastest no-overshoot return at exactly $1$, and a slow creep at $2$. Switch to phase space and the closed loop becomes a spiral that winds into the middle. Under the plot, the lab shows which regime you are in and its natural period. Try turning the drive on at $\omega_d = \omega_0$ with little damping to see resonance, which is the subject of the next lesson.
+Open the oscillator lab with drive strength $0$ and $\omega_0 = 2\ \text{rad/s}$. Slide the damping ratio $\zeta$ from 0 up to 2 and watch the three behaviours: a [ringing swing at $0.1$](/lab/oscillator?preset=ringing), the [fastest no-overshoot return at exactly $1$](/lab/oscillator?preset=critical-damping), and a [slow creep at $2$](/lab/oscillator?preset=overdamped). Switch to phase space and the closed loop becomes a spiral that winds into the middle. Under the plot, the lab shows which regime you are in and its natural period. Try turning the drive on at $\omega_d = \omega_0$ with little damping to see resonance, which is the subject of the next lesson.

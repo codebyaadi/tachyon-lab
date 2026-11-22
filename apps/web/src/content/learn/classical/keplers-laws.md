@@ -112,11 +112,11 @@ $v_p/v_a = 3.0/1.0 = 3$. The planet is three times as fast at perihelion as at a
 
 ## Common mistakes
 
-- **Putting the Sun at the centre of the ellipse.** It is at one focus, off to the side.
+- **Putting the Sun at the centre of the ellipse.** It is at one focus, off to the side. [See it in the lab](/lab/orbit?preset=ellipse-from-periapsis).
 - **Thinking the year depends on the planet's mass.** For a light planet it does not. Only the size of the orbit and the star's mass matter.
 - **Using the semi-major axis as the distance at every moment.** It is the average of $r_p$ and $r_a$, and the planet is only at that distance twice per orbit.
 - **Confusing equal areas with equal distances.** Equal areas means the speed changes, so the same stretch of path takes less time when the planet is close.
 
 ## Where this shows up in the lab
 
-Open the orbit lab. A launch speed of $1.0$ times circular gives a perfect circle. Try $1.2$: the planet starts at its closest point and swings out to an ellipse with $a = 1.79$ times the starting radius, so its year is $1.79^{3/2} = 2.39$ times longer than a circular year at the same radius. At $0.8$ the start is the farthest point instead. The page lists $T^2/a^3$ next to $4\pi^2/\mu$, and both read 39.48 in the lab's units, whatever the launch speed. Choose Euler and the energy drifts upward, which breaks the conservation laws this lesson relies on. Velocity Verlet keeps them.
+Open the orbit lab. A [launch speed of $1.0$ times circular](/lab/orbit?preset=circular-orbit) gives a perfect circle. Try [$1.2$](/lab/orbit?preset=ellipse-from-periapsis): the planet starts at its closest point and swings out to an ellipse with $a = 1.79$ times the starting radius, so its year is $1.79^{3/2} = 2.39$ times longer than a circular year at the same radius. At [$0.8$](/lab/orbit?preset=ellipse-from-apoapsis) the start is the farthest point instead. The page lists $T^2/a^3$ next to $4\pi^2/\mu$, and both read 39.48 in the lab's units, whatever the launch speed. [Choose Euler](/lab/orbit?preset=euler-spirals-out) and the energy drifts upward, which breaks the conservation laws this lesson relies on. Velocity Verlet keeps them.

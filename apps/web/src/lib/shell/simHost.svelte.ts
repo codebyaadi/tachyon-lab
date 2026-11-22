@@ -2,6 +2,7 @@ import * as Comlink from 'comlink';
 import { onMount } from 'svelte';
 import { type ParamSpec, type ParamValues, parseParams } from './params.ts';
 import { type PlotColors, cssColors } from './plotColors.ts';
+import { type Preset, presetParams, resolveInitial } from './presets.ts';
 import { decodeState, encodeState } from './urlState.ts';
 
 /** What every simulation worker exposes to the page (the pages talk to it through Comlink). */
@@ -27,6 +28,10 @@ export type SimHostOptions<P extends ParamValues> = {
 	readoutLen: number;
 	/** Accessible description of the plot. */
 	label: string;
+	/** Named setups, opened with `?preset=<id>` or from the preset list. */
+	presets?: Preset<P>[];
+	/** Parameters a preset must leave as the user has them (view settings, for example). */
+	keepOnPreset?: string[];
 };
 
 /**
@@ -46,6 +51,7 @@ export function createSimHost<P extends ParamValues, X extends object = object>(
 	let slow = $state(false);
 	let api: Comlink.Remote<SimWorkerApi> | undefined;
 
+	const presets = opts.presets ?? [];
 	const snapshot = () => $state.snapshot(params) as P;
 
 	let hashTimer: ReturnType<typeof setTimeout>;
@@ -96,7 +102,17 @@ export function createSimHost<P extends ParamValues, X extends object = object>(
 		let poll: ReturnType<typeof setInterval>;
 		void (async () => {
 			const state = await decodeState(location.hash);
-			if (state?.v === opts.version) params = parseParams(state.p, opts.specs, opts.defaults);
+			// Precedence: share-link hash, then ?preset=, then defaults (see resolveInitial).
+			const initial = resolveInitial({
+				hash: state,
+				version: opts.version,
+				presetId: new URLSearchParams(location.search).get('preset'),
+				presets,
+				specs: opts.specs,
+				defaults: opts.defaults
+			});
+			if (initial.unknownPreset) console.info('Unknown preset in the link; using the defaults.');
+			params = initial.params;
 			const offscreen = canvas.transferControlToOffscreen();
 			try {
 				await remote.init(Comlink.transfer(offscreen, [offscreen]), shared, snapshot(), cssColors());
@@ -156,6 +172,25 @@ export function createSimHost<P extends ParamValues, X extends object = object>(
 		onParam: (key: string, value: number | string) => patch({ [key]: value } as Partial<P>),
 		/** Change several parameters at once, with a single message to the worker. */
 		patch,
+		/** Open a named setup: the defaults with the preset over them, as one patch. */
+		applyPreset(id: string) {
+			const preset = presets.find((p) => p.id === id);
+			if (!preset) return;
+			const next = presetParams(preset, opts.specs, opts.defaults);
+			for (const key of opts.keepOnPreset ?? []) next[key as keyof P] = params[key as keyof P];
+			patch(next);
+		},
+		/** The preset whose setup the lab is showing right now, or '' once a parameter has been changed. */
+		get activePreset() {
+			const keep = opts.keepOnPreset ?? [];
+			const current = params as ParamValues;
+			return (
+				presets.find((p) => {
+					const full = presetParams(p, opts.specs, opts.defaults) as ParamValues;
+					return opts.specs.every((sp) => keep.includes(sp.key) || full[sp.key] === current[sp.key]);
+				})?.id ?? ''
+			);
+		},
 		/**
 		 * Call an extra method the worker exposes beyond the standard ones (for example "apply this gate").
 		 * `X` describes those extra methods, so the name and arguments are type-checked.

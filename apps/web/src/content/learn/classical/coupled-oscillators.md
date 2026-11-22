@@ -104,11 +104,11 @@ There are three, one for every mass. The highest is $\omega_3 = 18.48\ \text{rad
 
 ## Common mistakes
 
-- **Thinking the energy is lost** when one mass stops. It has passed to a neighbour.
+- **Thinking the energy is lost** when one mass stops. It has passed to a neighbour. [See it in the lab](/lab/coupled?preset=energy-passes-along).
 - **Expecting modes to depend on how you start it.** The modes and their frequencies belong to the chain. The start decides only how much of each mode is present.
 - **Forgetting that the number of modes equals the number of masses.**
 - **Treating $\omega_0$ as a mode frequency.** It is a building block. Every mode frequency comes from the formula.
 
 ## Where this shows up in the lab
 
-Open the coupled oscillators lab with $N = 2$ and $\omega_0 = 2\ \text{rad/s}$ and pluck the first mass. Plot one mass against time and watch it fade while the other grows. Set the start to mode 1 or mode 2 and the masses move in a single clean pattern at one frequency. Increase $N$ and the number of modes grows with it, spread between $0$ and $2\omega_0$.
+Open the [coupled oscillators lab](/lab/coupled?preset=energy-passes-along) with $N = 2$ and $\omega_0 = 2\ \text{rad/s}$ and pluck the first mass. Plot one mass against time and watch it fade while the other grows. Set the start to [mode 1](/lab/coupled?preset=normal-mode-1) or [mode 2](/lab/coupled?preset=normal-mode-2) and the masses move in a single clean pattern at one frequency. [Increase $N$](/lab/coupled?preset=five-masses) and the number of modes grows with it, spread between $0$ and $2\omega_0$.

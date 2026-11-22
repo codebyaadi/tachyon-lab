@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -87,6 +88,36 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'time', label: 'One mass against time' },
 			{ value: 'shape', label: 'The whole chain, as a snapshot' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<CoupledParams>[] = [
+	{
+		id: 'energy-passes-along',
+		label: 'Pluck the first of two masses',
+		summary:
+			'Mass 1 fades and mass 2 grows: the energy has not been lost, it moved. The energy drift readout stays near zero.',
+		params: { n: 2, mode: 0, amp: 1, watch: 1, omega0: 2, view: 'time' },
+		misconception: true
+	},
+	{
+		id: 'normal-mode-1',
+		label: 'Normal mode 1 of two masses',
+		summary: 'Both masses move together in one clean pattern, at a single frequency.',
+		params: { n: 2, mode: 1, amp: 1, watch: 1, omega0: 2, view: 'shape' }
+	},
+	{
+		id: 'normal-mode-2',
+		label: 'Normal mode 2 of two masses',
+		summary: 'The masses move in opposite directions, again at one frequency (higher than mode 1).',
+		params: { n: 2, mode: 2, amp: 1, watch: 1, omega0: 2, view: 'shape' }
+	},
+	{
+		id: 'five-masses',
+		label: 'Five masses, one plucked',
+		summary: 'A chain of N masses has N normal modes, with frequencies spread between 0 and 2ω₀.',
+		params: { n: 5, mode: 0, amp: 1, watch: 1, omega0: 2, view: 'shape' }
 	}
 ];
 

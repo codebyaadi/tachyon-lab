@@ -181,6 +181,17 @@ Lessons ship **with** the module that needs them. A module does not launch until
 4. Run `pnpm test` (content tests) and `pnpm dev` to read it in the browser.
 5. After your own review, set `status: reviewed`.
 
+### Adding a preset
+
+A preset is a named setup of a lab, opened with `/lab/<lab>?preset=<id>`. Lessons link to presets from *Common mistakes* and *Where this shows up in the lab*.
+
+1. Add an entry to `PRESETS` in `apps/web/src/lib/modules/<lab>/params.ts`: `id` (kebab-case, unique in the lab), `label`, a one-line `summary` saying what to look for, and `params`. `params` may only set keys that exist in the module's `SPECS`, with values in range; anything left out keeps the default. Do not change `VERSION`.
+2. Set `misconception: true` when the preset shows the correct physics that one of the lesson's listed mistakes gets wrong. Make presets only for mistakes the lesson states, and only where the lab can show them by changing its parameters.
+3. Link it from the lesson as `[See it in the lab](/lab/<lab>?preset=<id>)`.
+4. Run `pnpm --filter web test`. The tests check that every preset passes validation, ids are unique, every lesson link names a real preset, and every misconception preset is linked from a lesson.
+
+When a lab opens, a share-link hash wins over `?preset=`, and an unknown preset id is ignored with a note in the console.
+
 ## 8. Open questions
 
 1. ~~Tier field~~ **Decided:** `curriculum.ts` gets a per-topic `tier` field, and a test checks the counts (60 Core, 28 Extended) against this document.

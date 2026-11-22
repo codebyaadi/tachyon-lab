@@ -100,11 +100,11 @@ $1.01^{62.8} = 1.87$. The energy has nearly doubled in a single swing.
 
 ## Common mistakes
 
-- **Trusting a small step.** Euler's drift is slower with a smaller step, but it never stops.
-- **Judging a method by one short run.** A method that looks fine for ten seconds can be far off after a thousand.
-- **Thinking higher order always means better for long runs.** RK4 is very accurate per step, but only the symplectic methods guarantee bounded energy.
+- **Trusting a small step.** Euler's drift is slower with a smaller step, but it never stops. [See it in the lab](/lab/integrators?preset=small-step-still-drifts).
+- **Judging a method by one short run.** A method that looks fine for ten seconds can be far off after a thousand. [See it in the lab](/lab/integrators?preset=small-step-still-drifts).
+- **Thinking higher order always means better for long runs.** RK4 is very accurate per step, but only the symplectic methods guarantee bounded energy. [See it in the lab](/lab/integrators?preset=small-step-still-drifts).
 - **Mixing up the order of the updates.** Semi-implicit Euler and Euler differ only in whether the position update uses the old or the new velocity, and that single change matters.
 
 ## Where this shows up in the lab
 
-Open the integrators page. On the spring, with the step $dt = 0.05$, Euler's energy error climbs steadily while semi-implicit Euler and velocity Verlet stay in a narrow band. Switch to the planet and the same pattern appears over many orbits. Make $dt$ larger and watch Euler's error grow faster, as the factor $1 + \omega^2 dt^2$ says it should.
+Open the integrators page. On [the spring, with the step $dt = 0.05$](/lab/integrators?preset=spring), Euler's energy error climbs steadily while semi-implicit Euler and velocity Verlet stay in a narrow band. Switch to [the planet](/lab/integrators?preset=planet) and the same pattern appears over many orbits. [Make $dt$ larger](/lab/integrators?preset=large-step) and watch Euler's error grow faster, as the factor $1 + \omega^2 dt^2$ says it should.

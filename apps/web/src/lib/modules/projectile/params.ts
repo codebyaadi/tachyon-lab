@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -78,6 +79,38 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'semi', label: 'Semi-implicit Euler (1st order)' },
 			{ value: 'rk4', label: 'RK4 (4th order)' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<ProjectileParams>[] = [
+	{
+		id: 'worked-example',
+		label: 'The worked example',
+		summary: 'Speed 20 m/s at 30°, no drag. Predict the landing distance (35.3 m) before you launch.',
+		params: { speed: 20, angle: 30, height: 0, linear: 0, quadratic: 0, method: 'rk4' }
+	},
+	{
+		id: 'launch-from-height',
+		label: 'Launching from above the ground',
+		summary:
+			'30 m/s sideways and 40 m/s up from 2 m: it lands after about 8.2 s at 246 m. The level-ground range formula does not apply.',
+		params: { speed: 50, angle: 53.13, height: 2, linear: 0, quadratic: 0, method: 'rk4' },
+		misconception: true
+	},
+	{
+		id: 'real-ball-with-air',
+		label: 'A real ball in air',
+		summary:
+			'Quadratic drag like a baseball: the ball lands short of the drag-free parabola, which is drawn for comparison.',
+		params: { speed: 40, angle: 40, height: 0, linear: 0, quadratic: 0.006, method: 'rk4' },
+		misconception: true
+	},
+	{
+		id: 'euler-large-step',
+		label: 'Euler with a large step',
+		summary: 'The same throw with Euler and a big dt: the ball goes too high and lands too far.',
+		params: { speed: 20, angle: 30, height: 0, linear: 0, quadratic: 0, method: 'euler', dt: 0.2 }
 	}
 ];
 

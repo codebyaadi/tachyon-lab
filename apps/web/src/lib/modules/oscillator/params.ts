@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -100,6 +101,80 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'time', label: 'Position against time' },
 			{ value: 'phase', label: 'Phase space (velocity against position)' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<OscillatorParams>[] = [
+	{
+		id: 'simple-harmonic-motion',
+		label: 'Pure simple harmonic motion',
+		summary: 'No damping, no drive, ω₀ = 2 rad/s. One swing takes 2π/2 = 3.14 s.',
+		params: { zeta: 0, force: 0, omega0: 2, x0: 1, v0: 0, view: 'time' }
+	},
+	{
+		id: 'bigger-swing-same-period',
+		label: 'A bigger swing',
+		summary: 'Start at 2 m instead of 1 m. The period reads 3.14 s either way: a larger swing is faster, not slower.',
+		params: { zeta: 0, force: 0, omega0: 2, x0: 2, v0: 0, view: 'time' },
+		misconception: true
+	},
+	{
+		id: 'euler-energy-growth',
+		label: 'Euler adds energy',
+		summary:
+			'Phase space with Euler and a large step: the loop spirals outward. That is the integrator, not the physics.',
+		params: { zeta: 0, force: 0, omega0: 2, method: 'euler', dt: 0.1, view: 'phase' }
+	},
+	{
+		id: 'ringing',
+		label: 'Light damping (ζ = 0.1)',
+		summary:
+			'The swing rings and fades. Each swing loses the same fraction, so the amplitude decays exponentially, not in equal steps.',
+		params: { zeta: 0.1, force: 0, omega0: 2, view: 'time' },
+		misconception: true
+	},
+	{
+		id: 'critical-damping',
+		label: 'Critical damping (ζ = 1)',
+		summary: 'The fastest return to rest without overshooting.',
+		params: { zeta: 1, force: 0, omega0: 2, view: 'time' }
+	},
+	{
+		id: 'overdamped',
+		label: 'Heavy damping (ζ = 2)',
+		summary: 'More damping is not faster: it creeps back, never crossing the middle, and settles later than at ζ = 1.',
+		params: { zeta: 2, force: 0, omega0: 2, view: 'time' },
+		misconception: true
+	},
+	{
+		id: 'resonance',
+		label: 'Resonance',
+		summary:
+			'Starting at rest, ζ = 0.05 driven at ω_d = ω₀ = 2 rad/s: the swing grows to 1.25 m, ten times the 0.125 m steady stretch of the same force.',
+		params: { x0: 0, v0: 0, zeta: 0.05, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'time' }
+	},
+	{
+		id: 'tiny-force-resonance',
+		label: 'A tiny force at resonance',
+		summary:
+			'Starting at rest, a drive of only 0.1 m/s² builds the swing to 0.25 m: ten times the 0.025 m that the same force would hold the spring at if applied steadily. The rhythm and weak damping matter, not the size of the force.',
+		params: { x0: 0, v0: 0, zeta: 0.05, force: 0.1, omega0: 2, omegaDrive: 2, duration: 60, view: 'time' },
+		misconception: true
+	},
+	{
+		id: 'undamped-resonance',
+		label: 'Undamped resonance',
+		summary: 'ζ = 0 and ω_d = ω₀: the amplitude grows steadily without limit, and phase space spirals outward.',
+		params: { x0: 0, v0: 0, zeta: 0, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'phase' }
+	},
+	{
+		id: 'drive-wins',
+		label: 'The drive wins in the end',
+		summary:
+			'Driven at 3 rad/s while ω₀ = 2: after the opening transient the motion follows the drive frequency, not the natural one.',
+		params: { zeta: 0.2, force: 1, omega0: 2, omegaDrive: 3, duration: 40, view: 'time' },
+		misconception: true
 	}
 ];
 

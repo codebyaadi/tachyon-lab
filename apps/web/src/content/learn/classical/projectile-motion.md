@@ -129,10 +129,10 @@ Check with the formula: $R = 15^2 \sin 80^\circ / 9.81 = 225 \times 0.9848 / 9.8
 
 - **"Heavier things fall faster."** With no air, every object has the same downward acceleration $g$, so mass does not matter.
 - **Swapping sine and cosine.** Sine goes with the vertical component when $\theta$ is measured from the horizontal.
-- **Using $R = v_0^2\sin 2\theta/g$ when the ball lands at a different height.** That formula needs level ground. Otherwise solve $y(t) = 0$, a quadratic. For example, a launch from 2 m above the ground at 30 m/s sideways and 40 m/s upward stays up 8.20 s and travels 246 m (see the lab notebook, entry 01); the best angle is also a little under $45^\circ$.
+- **Using $R = v_0^2\sin 2\theta/g$ when the ball lands at a different height.** That formula needs level ground. Otherwise solve $y(t) = 0$, a quadratic. For example, a launch from 2 m above the ground at 30 m/s sideways and 40 m/s upward stays up 8.20 s and travels 246 m (see the lab notebook, entry 01); the best angle is also a little under $45^\circ$. [See it in the lab](/lab/projectile?preset=launch-from-height).
 - **Believing the acceleration is zero at the top.** It is $g$ downward all the way.
-- **Forgetting air.** Real balls land short of these predictions. The drag lesson explains by how much.
+- **Forgetting air.** Real balls land short of these predictions. The drag lesson explains by how much. [See it in the lab](/lab/projectile?preset=real-ball-with-air).
 
 ## Where this shows up in the lab
 
-Open the projectile lab and try the worked example: speed 20 m/s, angle 30°, no drag. Before you press Launch, type your predicted landing distance (35.3 m) in the Predict box, then compare. Next, turn on a little air drag and watch the ball fall short, and switch the integrator to Euler with a large time step to see a numerical method land in the wrong place. Continue with **Newton's laws** once it is written.
+Open the projectile lab and try [the worked example](/lab/projectile?preset=worked-example): speed 20 m/s, angle 30°, no drag. Before you press Launch, type your predicted landing distance (35.3 m) in the Predict box, then compare. Next, turn on a little air drag and watch the ball fall short, and [switch the integrator to Euler with a large time step](/lab/projectile?preset=euler-large-step) to see a numerical method land in the wrong place. Continue with **Newton's laws** once it is written.

@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -109,6 +110,32 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'phase', label: 'Phase space (angular velocity against angle)' },
 			{ value: 'time', label: 'Angle against time' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<PendulumParams>[] = [
+	{
+		id: 'small-swing',
+		label: 'A small swing',
+		summary: 'Start at 5°: the period is within 0.1% of the small-swing value 2π/ω₀ = 2.094 s.',
+		params: { theta0: 5, v0: 0, omega0: 3, zeta: 0, force: 0, view: 'phase' }
+	},
+	{
+		id: 'large-swing',
+		label: 'A large swing (120°)',
+		summary:
+			'The exact period is 2.875 s, well above the small-swing value 2.094 s. The formula 2π√(L/g) only holds for small swings.',
+		params: { theta0: 120, v0: 0, omega0: 3, zeta: 0, force: 0, view: 'phase' },
+		misconception: true
+	},
+	{
+		id: 'spinning',
+		label: 'Spinning over the top',
+		summary:
+			'From 5° with a start speed of 7 rad/s the pendulum goes right round. The same equation describes swinging and spinning: only the energy changed.',
+		params: { theta0: 5, v0: 7, omega0: 3, zeta: 0, force: 0, view: 'phase' },
+		misconception: true
 	}
 ];
 

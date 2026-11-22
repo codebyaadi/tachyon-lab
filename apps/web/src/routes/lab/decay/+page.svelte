@@ -1,10 +1,11 @@
 <script lang="ts">
 	import 'katex/dist/katex.min.css';
-	import { DEFAULTS, type DecayParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/decay/params.ts';
+	import { DEFAULTS, type DecayParams, R, READOUT_LEN, SPECS, VERSION , PRESETS } from '#lib/modules/decay/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
 	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import PresetPicker from '#lib/shell/PresetPicker.svelte';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -22,6 +23,7 @@
 		specs: SPECS,
 		defaults: DEFAULTS,
 		version: VERSION,
+		presets: PRESETS,
 		readoutLen: READOUT_LEN,
 		label: 'Plot of numerical and exact solutions y(t)'
 	});
@@ -109,6 +111,8 @@
 	</section>
 
 	<aside class="space-y-5">
+		<PresetPicker presets={PRESETS} onapply={sim.applyPreset} active={sim.activePreset} />
+
 		<div class="panel p-4">
 			<h2 class="mb-3 text-sm font-semibold">Parameters</h2>
 			<ParamPanel specs={SPECS} values={params} onchange={sim.onParam} />

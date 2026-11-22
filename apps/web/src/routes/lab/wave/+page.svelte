@@ -1,10 +1,11 @@
 <script lang="ts">
 	import 'katex/dist/katex.min.css';
-	import { DEFAULTS, GRID_HALF, R, READOUT_LEN, SPECS, VERSION, type WaveParams } from '#lib/modules/wave/params.ts';
+	import { DEFAULTS, GRID_HALF, R, READOUT_LEN, SPECS, VERSION, type WaveParams , PRESETS } from '#lib/modules/wave/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
 	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import PresetPicker from '#lib/shell/PresetPicker.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
@@ -22,6 +23,7 @@
 		specs: SPECS,
 		defaults: DEFAULTS,
 		version: VERSION,
+		presets: PRESETS,
 		readoutLen: READOUT_LEN,
 		label: 'Probability density of a quantum wave packet, with the potential and the packet energy'
 	});
@@ -237,6 +239,8 @@
 	</section>
 
 	<aside class="space-y-5">
+		<PresetPicker presets={PRESETS} onapply={sim.applyPreset} active={sim.activePreset} />
+
 		<div class="panel p-4">
 			<h2 class="mb-3 text-sm font-semibold">Parameters</h2>
 			<ParamPanel specs={SPECS} values={params} onchange={sim.onParam} />
