@@ -11,6 +11,7 @@
 	} from '#lib/modules/integrators/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -133,6 +134,7 @@
 				Try the orbit with a smaller step, then a longer run. Notice that making the step smaller lowers every line, but only the
 				symplectic ones stay flat.
 			</p>
+			<LabLessons href="/lab/integrators" />
 		</article>
 	</section>
 

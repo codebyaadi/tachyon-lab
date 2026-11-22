@@ -3,6 +3,7 @@
 	import { DEFAULTS, GRID_HALF, R, READOUT_LEN, SPECS, VERSION, type WaveParams } from '#lib/modules/wave/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -191,6 +192,7 @@
 					see the packet trapped and bouncing, and the <strong>Harmonic oscillator</strong> to see it swing back and forth like a
 					mass on a spring.
 				</p>
+				<LabLessons href="/lab/wave" />
 			{:else}
 				<div>{@html eq.schrodinger}</div>
 				<p>

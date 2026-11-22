@@ -3,6 +3,7 @@
 	import { DEFAULTS, type ProjectileParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/projectile/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
@@ -143,11 +144,7 @@
 					Now try <strong>Euler</strong> with a large dt. It adds energy, so the ball flies too high and lands too far.
 					<strong>Semi-implicit Euler</strong> makes the opposite error, and <strong>RK4</strong> barely errs at all.
 				</p>
-				<p>
-					New to this? Read the lesson on <a class="underline underline-offset-2" href="/learn/classical/projectile-motion"
-						>projectile motion</a
-					>.
-				</p>
+				<LabLessons href="/lab/projectile" />
 			{:else}
 				<p>Acceleration per unit mass, with gravity, linear drag k and quadratic drag c:</p>
 				<div>{@html eq.accel}</div>

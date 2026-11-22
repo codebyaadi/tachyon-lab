@@ -3,6 +3,7 @@
 	import { DEFAULTS, type PendulumParams, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/pendulum/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -175,6 +176,7 @@
 					Try a start angle of 179°: the pendulum hangs almost upside down, balanced for a long time before it falls. That slow
 					crawl near the top is why the period grows without limit as the swing approaches 180°.
 				</p>
+				<LabLessons href="/lab/pendulum" />
 			{:else}
 				<div>{@html eq.ode}</div>
 				<p>For small angles, sin θ ≈ θ and it becomes the simple harmonic oscillator:</p>

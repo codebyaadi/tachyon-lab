@@ -3,6 +3,7 @@
 	import { type CoupledParams, DEFAULTS, R, READOUT_LEN, SPECS, VERSION } from '#lib/modules/coupled/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
+	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
@@ -172,6 +173,7 @@
 					Switch the plot to the whole chain to see the standing waves as shapes. More masses give more modes, with the
 					frequencies bunching together toward the top.
 				</p>
+				<LabLessons href="/lab/coupled" />
 			{:else}
 				<div>{@html eq.chain}</div>
 				<p>The normal-mode frequencies and shapes (the table above uses this formula, and the tests check it against an eigenvalue solver):</p>
