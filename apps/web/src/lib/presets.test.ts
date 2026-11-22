@@ -147,3 +147,47 @@ describe('which setup a lab starts with', () => {
 		expect(r.params).toEqual({ a: 7, m: 'y' });
 	});
 });
+
+describe('the oscillator resonance presets', () => {
+	// Driven at ω_d = ω₀, the steady amplitude is F / (2ζω₀²), which is 1/(2ζ) times the static
+	// stretch F / ω₀². The summaries quote these numbers, so a change to the params must show up here.
+	const osc = byLab.get('/lab/oscillator');
+	const steady = (id: string) => {
+		const p = osc?.PRESETS.find((x) => x.id === id);
+		expect(p, id).toBeDefined();
+		const { x0, v0, zeta, force, omega0, omegaDrive } = presetParams(p!, osc!.SPECS, osc!.DEFAULTS) as Record<
+			string,
+			number
+		>;
+		return {
+			p: p!,
+			x0,
+			v0,
+			zeta,
+			force,
+			omega0,
+			omegaDrive,
+			amplitude: force / (2 * zeta * omega0 ** 2),
+			stretch: force / omega0 ** 2
+		};
+	};
+
+	it.each([
+		['tiny-force-resonance', 0.25, 0.025],
+		['resonance', 1.25, 0.125]
+	])('%s starts at rest on resonance and grows to the amplitude its summary quotes', (id, amplitude, stretch) => {
+		const s = steady(id);
+		expect([s.x0, s.v0]).toEqual([0, 0]);
+		expect(s.omegaDrive).toBe(s.omega0);
+		expect(s.amplitude).toBeCloseTo(amplitude, 12);
+		expect(s.stretch).toBeCloseTo(stretch, 12);
+		expect(s.amplitude / s.stretch).toBeCloseTo(1 / (2 * s.zeta), 9);
+		expect(s.p.summary).toContain(`${amplitude} m`);
+		expect(s.p.summary).toContain(`${stretch} m`);
+	});
+
+	it('undamped-resonance also starts at rest', () => {
+		const s = steady('undamped-resonance');
+		expect([s.x0, s.v0]).toEqual([0, 0]);
+	});
+});

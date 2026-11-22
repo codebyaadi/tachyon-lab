@@ -150,22 +150,23 @@ export const PRESETS: Preset<OscillatorParams>[] = [
 	{
 		id: 'resonance',
 		label: 'Resonance',
-		summary: 'ζ = 0.05, driven at ω_d = ω₀ = 2 rad/s: the response swells far beyond the push.',
-		params: { zeta: 0.05, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'time' }
+		summary:
+			'Starting at rest, ζ = 0.05 driven at ω_d = ω₀ = 2 rad/s: the swing grows to 1.25 m, ten times the 0.125 m steady stretch of the same force.',
+		params: { x0: 0, v0: 0, zeta: 0.05, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'time' }
 	},
 	{
 		id: 'tiny-force-resonance',
 		label: 'A tiny force at resonance',
 		summary:
-			'The drive is only 0.1 m/s², yet the amplitude grows large. The rhythm and weak damping matter, not the size of the force.',
-		params: { zeta: 0.05, force: 0.1, omega0: 2, omegaDrive: 2, duration: 60, view: 'time' },
+			'Starting at rest, a drive of only 0.1 m/s² builds the swing to 0.25 m: ten times the 0.025 m that the same force would hold the spring at if applied steadily. The rhythm and weak damping matter, not the size of the force.',
+		params: { x0: 0, v0: 0, zeta: 0.05, force: 0.1, omega0: 2, omegaDrive: 2, duration: 60, view: 'time' },
 		misconception: true
 	},
 	{
 		id: 'undamped-resonance',
 		label: 'Undamped resonance',
 		summary: 'ζ = 0 and ω_d = ω₀: the amplitude grows steadily without limit, and phase space spirals outward.',
-		params: { zeta: 0, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'phase' }
+		params: { x0: 0, v0: 0, zeta: 0, force: 0.5, omega0: 2, omegaDrive: 2, duration: 40, view: 'phase' }
 	},
 	{
 		id: 'drive-wins',
