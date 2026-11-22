@@ -37,6 +37,14 @@ Tachyon Lab only works if you can trust it, so every solver is checked against a
 | Orbits & central forces      | Verlet       | Angular momentum over 4·10⁵ steps; energy error stays bounded     | |ΔL/L| < 1e-10; |ΔE/E| < 5e-3                       | ✅     |
 | Orbits & central forces      | Euler        | Energy and angular momentum grow, so the orbit spirals outward     | qualitative (asserted in tests)                        | ✅     |
 | Orbits & central forces      | Semi-implicit Euler | A circular orbit stays circular over 2·10⁵ steps            | radius within 1% of start                              | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Exponential decay (t = 10) and harmonic oscillator (t = 20) vs exact at rtol = atol = 1e-10 | global error < 1e-8 (measured 1.8e-11, 8.2e-10) | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Global error vs tolerance at rtol = 1e-6, 1e-8, 1e-10 (decay, oscillator) | each two decades of rtol gives 1–4 decades of error | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Fixed-step mode (fac_min = fac_max = 1): halving h divides the error by 2⁵ | ratio within 25–40 (measured 33.3, 32.3)               | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Kepler e = 0.9, 10 periods at rtol = atol = 1e-12: energy and angular momentum | \|ΔE/E\|, \|ΔL/L\| < 1e-9 (measured 1.8e-10, 1.5e-11) | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Same orbit: position after each period vs the start             | within 1e-6 · a (measured 4.1e-8 · a)                  | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | Mean accepted h near apocentre vs near pericentre (e = 0.9)       | ratio ≥ 10 (measured 39)                               | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | `integrate_to` lands on the requested end time                    | bit-for-bit equal t                                    | ✅     |
+| Adaptive integrator          | Dormand–Prince 5(4) | FSAL: every step after the first costs six evaluations; a collapsing step is an error, not a panic | exact count; error returned | ✅     |
 | Coupled oscillators          | Eigen        | Jacobi eigenvalues of N masses (N ≤ 12) vs ωₖ = 2ω₀ sin(kπ / (2(N+1))) | rel. error < 1e-10                                  | ✅     |
 | Coupled oscillators          | Closed form  | Mode shapes are orthogonal; a single mode is a standing wave at its own frequency | abs. error < 1e-12                           | ✅     |
 | Coupled oscillators          | RK4          | Five masses with one plucked vs the exact normal-mode sum (dt = 1e-3) | abs. error < 1e-8                                 | ✅     |
