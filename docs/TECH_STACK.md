@@ -18,6 +18,12 @@ So the stack is chosen in that order of importance:
 
 ## 1. The stack
 
+This table is the full decided stack, including parts not built yet.
+
+**In use today:** Rust → WASM (SIMD128) built by `scripts/build-wasm.mjs`, one worker per lab with Comlink and a SharedArrayBuffer for readouts (with a polling fallback), the custom WebGL2 line renderer (`lib/gl/linePlot.ts`, also used to draw the Bloch sphere as projected lines), Svelte 5, SvelteKit with `adapter-static`, Vite+, pnpm, TypeScript, Valibot, URL state, Tailwind v4 with Fontsource fonts, KaTeX prerendered at build time, the unified lesson pipeline, `approx` as the only Rust test dependency, Vitest, clippy and rustfmt, GitHub Actions, and Cloudflare Pages.
+
+**Not adopted yet:** uPlot, Three.js/Threlte, WebGPU, Bits UI, mdsvex, ts-fsrs and IndexedDB (spaced review, experiment log), the service worker, sonification, build-time lesson figures, `rustfft`/`nalgebra`/`proptest`/`criterion`, Vitest browser mode, the Python golden data, the `/bench` page and the size-budget check in CI.
+
 | Layer                        | Choice                                                                                                                                                                                                        | Why this over the alternatives                                                                                                                                                                            |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Physics core**             | **Rust (stable) → `wasm32-unknown-unknown`** with **SIMD128** enabled, `f64` everywhere                                                                                                                       | Predictable speed with no GC pauses, real SIMD, and native `cargo test` for fast physics validation. Rust is also a pleasant language for numerical code. WASM SIMD is supported in all current browsers. |
@@ -50,11 +56,13 @@ So the stack is chosen in that order of importance:
 | Lint / format                | **Vite+** `vp check` (Oxlint + Oxfmt, type-aware) + **svelte-check** + **clippy** / **rustfmt**                                                                                                      | Rust-based and fast; one command for lint, format and type checks, part of the same Vite+ toolchain as build and test.                                                                                                |
 | Tests                        | **cargo test** (physics, native speed) · **Vitest** via `vp test` (TS unit) · **Vitest browser mode** + Playwright provider (WebGL screenshots, visual regression) · **Python/NumPy/SciPy** golden data in `/reference` | Physics is checked natively, rendering in a real browser, and results against an independent implementation.                                                                                              |
 | Benchmarks                   | **criterion** (native) + an in-app `/bench` page (WASM in the browser, reports ms/step)                                                                                                                       | Performance budgets are tested, not hoped for.                                                                                                                                                            |
-| CI                           | **GitHub Actions**: clippy, cargo test, wasm build, vp check, svelte-check, vp test, size budget check, deploy                                                                                                    | A failing physics test or blown budget blocks deploy.                                                                                                                                                     |
-| Hosting                      | **Cloudflare** (Workers static assets or Pages) with a `_headers` file for `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Embedder-Policy: require-corp`                                           | Free, global CDN, preview per PR; the headers enable SharedArrayBuffer.                                                                                                                                   |
+| CI                           | **GitHub Actions**: wasm build, vp check, clippy (native and wasm32), rustfmt, cargo test, svelte-check, vp test, site build, deploy; a size-budget check is planned                                                                                                  | A failing physics test blocks deploy.                                                                                                                                                                    |
+| Hosting                      | **Cloudflare Pages** ([tachyon-lab.pages.dev](https://tachyon-lab.pages.dev)), deployed from `main` by CI with `wrangler pages deploy`, with a `_headers` file for `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Embedder-Policy: require-corp`                                           | Free, global CDN; the headers enable SharedArrayBuffer.                                                                                                                                                   |
 | Analytics (later)            | Plausible, or none                                                                                                                                                                                            | Cookie-free.                                                                                                                                                                                              |
 
-## 2. Performance budgets (enforced in CI / `/bench`)
+## 2. Performance budgets
+
+These are targets. They are not enforced automatically yet: the `/bench` page and the CI size check are still planned.
 
 | Budget          | Target                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------- |
@@ -83,6 +91,8 @@ Rough feasibility check: a complex FFT of N = 4096 is about 250k flops. Split-st
  readout panel ◄── reads SharedArrayBuffer (throttled to ~10 Hz)
 ```
 
+Without cross-origin isolation (no COOP/COEP headers) there is no SharedArrayBuffer. The page then polls the worker's `getReadouts()` over Comlink at the same rate. `lib/shell/simHost.svelte.ts` handles both cases.
+
 The array view into WASM memory (`Float64Array` over `memory.buffer`) is uploaded straight to the GPU. No copies, no serialization.
 
 ## 4. Why not…
@@ -100,51 +110,40 @@ The array view into WASM memory (`Float64Array` over `memory.buffer`) is uploade
 ## 5. Repo layout
 
 ```
-qmproj/
+tachyon-lab/
 ├─ crates/
-│  ├─ physics/            # pure Rust: ode/, fft/, linalg/, tdse/, observables/, analytic/  (no wasm deps)
-│  └─ physics-wasm/       # thin wasm-bindgen layer: exported sim structs, memory views
-├─ apps/web/              # SvelteKit app
+│  ├─ physics/            # pure Rust, no wasm deps: ode/ (Euler, semi-implicit Euler, RK4, Verlet), analytic,
+│  │                      # projectile, oscillator, pendulum, coupled, kepler, qubit, schrodinger (FFT + split-step)
+│  └─ physics-wasm/       # thin wasm-bindgen layer: one *Sim struct per lab, history buffers read via *_ptr()
+├─ apps/web/              # SvelteKit app (fully prerendered)
+│  ├─ static/_headers     # COOP/COEP (SharedArrayBuffer) and cache headers for Cloudflare
 │  └─ src/
-│     ├─ lib/shell/       # time controls, URL state, Learn/Inspect, Predict panel, export
-│     ├─ lib/gl/          # WebGL2 plot renderer (runs in worker)
-│     ├─ lib/workers/     # sim.worker.ts: loads WASM, owns OffscreenCanvas
-│     ├─ lib/modules/     # cm-integrators/, cm-oscillator/, …, qm-1d/, qubit/
-│     ├─ lib/learn/       # curriculum.ts (topic map), lesson loader and Markdown renderer (server-only)
+│     ├─ lib/shell/       # simHost (worker/canvas lifecycle, readouts, share links), params, URL state,
+│     │                   # ParamPanel, axis labels, plot colours, theme toggle
+│     ├─ lib/gl/          # linePlot.ts: WebGL2 line renderer (runs in the worker)
+│     ├─ lib/workers/     # <lab>.worker.ts: loads WASM, owns the OffscreenCanvas and frame loop
+│     ├─ lib/modules/     # <lab>/params.ts: parameter specs, defaults, readout slots
+│     ├─ lib/wasm/pkg/    # generated by scripts/build-wasm.mjs (git-ignored)
+│     ├─ lib/learn/       # curriculum.ts (topic map), lesson schema, parser, validator, loader, renderer
+│     ├─ lib/labs.ts      # the list of labs shown on the home page and /lab
 │     ├─ content/learn/   # classical/<slug>.md, quantum/<slug>.md, _template.md
-│     ├─ lib/review/      # spaced review (ts-fsrs + IndexedDB wrapper)
-│     └─ routes/          # /lab/[module], /learn, /learn/[track]/[slug], /docs/[module], /notebook/[entry], /bench
-├─ scripts/               # build-wasm.mjs, build-figures.mjs (lesson figures from the solver)
-├─ reference/             # Python notebooks → golden JSON for tests
+│     └─ routes/          # /, /lab, /lab/<lab>, /learn, /learn/[track]/[slug]
+├─ scripts/               # build-wasm.mjs
+├─ reference/             # Python notebooks → golden JSON for tests (planned; README only)
 ├─ docs/                  # CURRICULUM, VALIDATION, TECH_STACK, notebook/
 ├─ Cargo.toml             # Rust workspace
+├─ package.json           # root scripts: dev, build, test, check, lint, format
 ├─ pnpm-workspace.yaml
 └─ .github/workflows/ci.yml
 ```
 
+Planned additions: `lib/review/` (spaced review), `/docs/[module]`, `/notebook/[entry]` and `/bench` routes, and `scripts/build-figures.mjs` (lesson figures from the solver).
+
 ## 6. Getting started
 
-Prerequisites (inside WSL recommended): Rust via rustup, Node 24 (Vite+ requires ^22.18 or ^24.11), pnpm, Python 3.12+.
+Prerequisites: Rust via rustup, Node 24 (Vite+ requires ^22.18 or ^24.11) and pnpm 10. Python 3.12+ is only needed for the planned reference notebooks.
 
-```bash
-rustup target add wasm32-unknown-unknown
-```
-```bash
-cargo install wasm-bindgen-cli --version 0.2.130 --locked
-```
-```bash
-pnpm dlx sv create apps/web
-```
-```bash
-cargo new --lib crates/physics
-```
-
-Enable SIMD for the wasm target in `.cargo/config.toml`:
-
-```toml
-[target.wasm32-unknown-unknown]
-rustflags = ["-C", "target-feature=+simd128"]
-```
+The setup steps and everyday commands are in the [README](../README.md#getting-started). The wasm-bindgen CLI version must match the one pinned in `crates/physics-wasm/Cargo.toml`, and `scripts/build-wasm.mjs` checks this. SIMD is already enabled for the wasm target in `.cargo/config.toml`.
 
 ## Sources
 
