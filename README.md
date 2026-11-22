@@ -34,7 +34,7 @@ Accuracy is a feature: every solver is tested against analytic results, and ever
 |---|---|
 | **Works today** | **Projectile lab**: launch with or without air drag, predict the landing point, and compare Euler, semi-implicit Euler and RK4 with the exact answer · **Wave packet lab**: a split-step Schrödinger solver with a free packet, barrier (tunnelling), well, step, harmonic oscillator and box, checked against exact spreading, transmission and energy levels · **Qubit lab**: gates as rotations of the Bloch sphere, and T₁/T₂ decoherence as exact Kraus channels · **Pendulum lab**: nonlinear swings, the separatrix and the exact elliptic-function period · **Coupled oscillators lab**: a spring chain with its normal modes, checked against an eigenvalue solver · **Energy comparison**: Euler, semi-implicit Euler, RK4 and Verlet side by side on a log scale · **Orbit lab**: a planet around a star against the exact Kepler ellipse, with Euler, semi-implicit Euler, RK4 and velocity Verlet, and live energy and angular-momentum drift · **Oscillator lab**: a damped, driven spring in time and in phase space, with resonance and the energy an integrator adds or loses · exponential-decay lab · Rust physics core (Euler, semi-implicit Euler, RK4, velocity Verlet, 2D projectile with linear and quadratic drag, damped driven oscillator, nonlinear pendulum, spring chain, Kepler orbit, single-qubit gates and noise, an FFT and split-step Schrödinger solver, analytic solutions) · WebGL2 plotting in a worker · URL-shareable state · light and dark themes · the Learn pipeline and `/learn` pages |
 | **Written** | 12 of 88 lessons (projectile motion, describing motion, simple harmonic motion, damped and driven oscillations, the pendulum, coupled oscillators, numerical integration, Kepler's laws, the qubit and Bloch sphere, decoherence, the Schrödinger equation), all marked _draft_ until the author has reviewed them |
-| **Next** | The shared module shell (the two labs still duplicate some page code), sketch-your-prediction, misconception presets, and an energy-versus-time plot comparing integrators |
+| **Next** | Sketch-your-prediction, misconception presets linked from each lesson's _Common mistakes_, the remaining validation checks marked planned in [docs/VALIDATION.md](docs/VALIDATION.md), and more lessons |
 
 Lessons carry a visible **draft / reviewed** label because physics errors destroy trust. A lesson is only marked reviewed after its key steps have been derived by hand.
 
@@ -101,7 +101,8 @@ Corrections are the most valuable contribution: if a lesson or a simulation gets
 1. Physics in `crates/physics/src/…`, with tests against analytic results (see [docs/VALIDATION.md](docs/VALIDATION.md)).
 2. A simulation struct in `crates/physics-wasm/src/` exposing `advance`, readouts and `*_ptr()` buffers.
 3. In `apps/web/src/lib/`: `modules/<name>/params.ts` (parameter specs and defaults) and `workers/<name>.worker.ts`.
-4. A route at `apps/web/src/routes/lab/<name>/` with its page and build-time equations in `+page.server.ts`.
+4. A route at `apps/web/src/routes/lab/<name>/` whose page uses `createSimHost` from `lib/shell/simHost.svelte.ts` (worker, canvas, readouts and share links), with build-time equations in `+page.server.ts`.
+5. An entry in `apps/web/src/lib/labs.ts` so it appears on the home page and the lab index.
 
 `modules/decay` is the reference example.
 
