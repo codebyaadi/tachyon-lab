@@ -11,10 +11,11 @@
 		READOUT_LEN,
 		SPECS,
 		VERSION
-	} from '#lib/modules/qubit/params.ts';
+	, PRESETS } from '#lib/modules/qubit/params.ts';
 	import { fmt } from '#lib/shell/format.ts';
 	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import PresetPicker from '#lib/shell/PresetPicker.svelte';
 	import { PLOT_PAD } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
@@ -32,6 +33,8 @@
 		specs: SPECS,
 		defaults: DEFAULTS,
 		version: VERSION,
+		presets: PRESETS,
+		keepOnPreset: ['look', 'feel', 'az', 'el', 'speed', 'angle'],
 		readoutLen: READOUT_LEN,
 		label: 'Bloch sphere showing the qubit state as an arrow, with the ideal state for comparison'
 	});
@@ -339,6 +342,8 @@
 	</section>
 
 	<aside class="space-y-5">
+		<PresetPicker presets={PRESETS} onapply={sim.applyPreset} active={sim.activePreset} />
+
 		<div class="panel p-4">
 			<h2 class="mb-3 text-sm font-semibold">Parameters</h2>
 			<ParamPanel specs={SPECS} values={params} onchange={sim.onParam} />

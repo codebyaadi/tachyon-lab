@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -48,6 +49,36 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'rk4', label: 'RK4 (4th order)' },
 			{ value: 'verlet', label: 'Velocity Verlet (2nd order, symplectic)' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<OrbitParams>[] = [
+	{
+		id: 'circular-orbit',
+		label: 'A circular orbit',
+		summary: 'Launch at exactly the circular speed: the path is a circle.',
+		params: { ratio: 1, method: 'verlet' }
+	},
+	{
+		id: 'ellipse-from-periapsis',
+		label: 'Launch faster than circular (1.2×)',
+		summary:
+			'The planet starts at its closest point and swings out to an ellipse with the star at one focus, not at the centre. a = 1.79 times the starting radius.',
+		params: { ratio: 1.2, method: 'verlet' },
+		misconception: true
+	},
+	{
+		id: 'ellipse-from-apoapsis',
+		label: 'Launch slower than circular (0.8×)',
+		summary: 'The start is now the farthest point of the ellipse.',
+		params: { ratio: 0.8, method: 'verlet' }
+	},
+	{
+		id: 'euler-spirals-out',
+		label: 'Euler breaks conservation',
+		summary: 'With Euler the energy drifts upward and the orbit spirals outward. Velocity Verlet keeps both conserved.',
+		params: { ratio: 0.8, method: 'euler' }
 	}
 ];
 

@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -114,6 +115,51 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'density', label: 'Probability density only' },
 			{ value: 'wave', label: 'Density and the real part of ψ' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<WaveParams>[] = [
+	{
+		id: 'free-space',
+		label: 'Free space',
+		summary: 'The packet spreads, and the exact formula drawn over it agrees.',
+		params: { potential: 'free', k0: 1, sigma: 6, start: -40, show: 'density' }
+	},
+	{
+		id: 'narrow-packet',
+		label: 'A narrow packet',
+		summary:
+			'σ = 1.5: it spreads much faster than a wide one, because it is a wide mix of wave numbers, not a single wave.',
+		params: { potential: 'free', k0: 1, sigma: 1.5, start: -40, show: 'density' },
+		misconception: true
+	},
+	{
+		id: 'wavefunction-not-probability',
+		label: 'The wave and its density',
+		summary: 'Show the wave itself: ψ goes negative and oscillates. Only |ψ|², the density, is a probability.',
+		params: { potential: 'free', k0: 1, sigma: 6, start: -40, show: 'wave' },
+		misconception: true
+	},
+	{
+		id: 'tunnelling',
+		label: 'Tunnelling through a barrier',
+		summary:
+			'V₀ = 0.8, width 2, k₀ = 1: about 16% gets through, yet the average energy stays 0.5. Nothing climbs the barrier.',
+		params: { potential: 'barrier', k0: 1, sigma: 6, start: -40, v0: 0.8, width: 2, show: 'density' },
+		misconception: true
+	},
+	{
+		id: 'box',
+		label: 'A particle in a box',
+		summary: 'The packet bounces between hard walls.',
+		params: { potential: 'box', k0: 1, sigma: 3, width: 40, duration: 100, show: 'density' }
+	},
+	{
+		id: 'harmonic-oscillator',
+		label: 'A packet in a harmonic well',
+		summary: 'Released from rest, a packet of the ground-state width swings back and forth without spreading.',
+		params: { potential: 'harmonic', k0: 0, sigma: 2.2, start: -20, omega: 0.1, duration: 70, show: 'density' }
 	}
 ];
 

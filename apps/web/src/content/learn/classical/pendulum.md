@@ -116,11 +116,11 @@ $1.373 \times 2.094 = 2.875\ \text{s}$.
 
 ## Common mistakes
 
-- **Using $T = 2\pi\sqrt{L/g}$ for large swings.** It is only right for small ones, where $\sin\theta \approx \theta$.
+- **Using $T = 2\pi\sqrt{L/g}$ for large swings.** It is only right for small ones, where $\sin\theta \approx \theta$. [See it in the lab](/lab/pendulum?preset=large-swing).
 - **Believing the mass changes the period.** It cancels out, because gravity's pull is proportional to the mass.
 - **Forgetting that the angle must be in radians** in $\theta_0^2/16$.
-- **Treating spinning as a failure of the equation.** The same equation describes both, and the change is only in the energy.
+- **Treating spinning as a failure of the equation.** The same equation describes both, and the change is only in the energy. [See it in the lab](/lab/pendulum?preset=spinning).
 
 ## Where this shows up in the lab
 
-Open the pendulum lab with the small-swing frequency $\omega_0 = 3\ \text{rad/s}$ and a start angle of $120^\circ$. The page shows the exact period, 2.875 s, next to the small-swing value, 2.094 s. Switch to phase space to see the loop stretched out of its small-swing ellipse. Then set the start angle to its smallest value, $5^\circ$, and raise the start speed past $6\ \text{rad/s}$: the closed loop opens into a spinning track. The curve that separates the two is the separatrix.
+Open the [pendulum lab](/lab/pendulum?preset=large-swing) with the small-swing frequency $\omega_0 = 3\ \text{rad/s}$ and a start angle of $120^\circ$. The page shows the exact period, 2.875 s, next to the small-swing value, 2.094 s. Switch to phase space to see the loop stretched out of its small-swing ellipse. Then set the start angle to its smallest value, $5^\circ$ ([a small swing](/lab/pendulum?preset=small-swing)), and [raise the start speed past $6\ \text{rad/s}$](/lab/pendulum?preset=spinning): the closed loop opens into a spinning track. The curve that separates the two is the separatrix.

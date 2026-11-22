@@ -103,11 +103,11 @@ So $P(0) = (1 + 0)/2 = 0.5$.
 
 ## Common mistakes
 
-- **Thinking the poles are the only states.** Every point on the sphere is a valid state, and the equator is an equal blend.
+- **Thinking the poles are the only states.** Every point on the sphere is a valid state, and the equator is an equal blend. [See it in the lab](/lab/qubit?preset=equator-state).
 - **Reading phase from the height.** Height gives the measurement chance. The phase is the longitude, and it does not show up in a single measurement.
-- **Expecting S and T to change the chance of 0.** They turn about the vertical axis, so $z$ stays the same.
-- **Choosing $T_2$ longer than $2T_1$.** It cannot happen, because energy loss itself destroys the phase. The lab caps $T_2$ at $2T_1$.
+- **Expecting S and T to change the chance of 0.** They turn about the vertical axis, so $z$ stays the same. [See it in the lab](/lab/qubit?preset=phase-gates-keep-p0).
+- **Choosing $T_2$ longer than $2T_1$.** It cannot happen, because energy loss itself destroys the phase. The lab caps $T_2$ at $2T_1$. [See it in the lab](/lab/qubit?preset=t2-capped).
 
 ## Where this shows up in the lab
 
-Open the qubit lab, press H, then T, then H, and the arrow lands at $(0, -0.707, 0.707)$ with $P(0) = 0.854$. Drag the sphere to look at it from any side. The circuit is saved in the share link. Then switch noise on, press Let time pass, and watch the arrow sink toward $|0\rangle$ and shrink toward the vertical axis. Purity falls from 1 toward ½ as the arrow moves into the sphere.
+Open the qubit lab, [press H, then T, then H](/lab/qubit?preset=hadamard-t-hadamard), and the arrow lands at $(0, -0.707, 0.707)$ with $P(0) = 0.854$. Drag the sphere to look at it from any side. The circuit is saved in the share link. Then [switch noise on](/lab/qubit?preset=noisy-equator), press Let time pass, and watch the arrow sink toward $|0\rangle$ and shrink toward the vertical axis. Purity falls from 1 toward ½ as the arrow moves into the sphere.

@@ -114,11 +114,11 @@ The product is $3.61 \times 0.167 = 0.60$, above $\tfrac12$ because the packet h
 
 ## Common mistakes
 
-- **Treating ψ as a probability.** The probability density is $|\psi|^2$, and the wavefunction itself can be negative or complex.
+- **Treating ψ as a probability.** The probability density is $|\psi|^2$, and the wavefunction itself can be negative or complex. [See it in the lab](/lab/wave?preset=wavefunction-not-probability).
 - **Picturing a small ball hiding somewhere inside the packet.** The packet is the complete description. It says where the particle is likely to be found, not where a hidden ball already sits.
-- **Expecting tunnelling to cost energy.** The average energy stays 0.5 in the lab. Nothing climbs the barrier.
-- **Thinking a narrow packet is a good approximation of a single wave.** It is a wide mix of wave numbers, and that is why it spreads.
+- **Expecting tunnelling to cost energy.** The average energy stays 0.5 in the lab. Nothing climbs the barrier. [See it in the lab](/lab/wave?preset=tunnelling).
+- **Thinking a narrow packet is a good approximation of a single wave.** It is a wide mix of wave numbers, and that is why it spreads. [See it in the lab](/lab/wave?preset=narrow-packet).
 
 ## Where this shows up in the lab
 
-Open the wave packet lab and choose free space. The packet spreads, and the exact formula, drawn over it, agrees. Then choose the barrier with $V_0 = 0.8$, width 2 and $k_0 = 1$, and press Run. The page shows about 16% transmitted, close to the formula's 0.157. The lab snaps the barrier to whole grid cells, so its own exact value is 0.150. Try the box to see the packet bounce, and the harmonic oscillator to see it swing.
+Open the wave packet lab and [choose free space](/lab/wave?preset=free-space). The packet spreads, and the exact formula, drawn over it, agrees. Then [choose the barrier with $V_0 = 0.8$, width 2 and $k_0 = 1$](/lab/wave?preset=tunnelling), and press Run. The page shows about 16% transmitted, close to the formula's 0.157. The lab snaps the barrier to whole grid cells, so its own exact value is 0.150. Try [the box](/lab/wave?preset=box) to see the packet bounce, and [the harmonic oscillator](/lab/wave?preset=harmonic-oscillator) to see it swing.

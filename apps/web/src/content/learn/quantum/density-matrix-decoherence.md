@@ -104,11 +104,11 @@ $|\mathbf r|^2 = 0.135 + 0.155 = 0.290$, so the purity is $\tfrac12(1.290) = 0.6
 
 ## Common mistakes
 
-- **Mixing up the two clocks.** $T_1$ is about energy and the poles. $T_2$ is about phase and the horizontal part.
-- **Thinking noise always lowers the chance of 0.** Relaxation raises it, because the qubit falls toward $|0\rangle$.
+- **Mixing up the two clocks.** $T_1$ is about energy and the poles. $T_2$ is about phase and the horizontal part. [See it in the lab](/lab/qubit?preset=two-clocks).
+- **Thinking noise always lowers the chance of 0.** Relaxation raises it, because the qubit falls toward $|0\rangle$. [See it in the lab](/lab/qubit?preset=relaxation-raises-p0).
 - **Reading purity as the length of the arrow.** The purity is $\tfrac12(1 + |\mathbf r|^2)$, so it never falls below one half.
-- **Choosing $T_2 > 2T_1$.** It is impossible, and the lab limits it.
+- **Choosing $T_2 > 2T_1$.** It is impossible, and the lab limits it. [See it in the lab](/lab/qubit?preset=t2-capped).
 
 ## Where this shows up in the lab
 
-Open the qubit lab, press H to start on the equator, switch noise on with $T_1 = 6\ \text{s}$ and $T_2 = 4\ \text{s}$, and press Let time pass. The arrow shortens and rises, and the readouts show the chance of 0, the purity and the fidelity changing. After about 3 seconds they match the worked example. Left to run, the arrow ends at the north pole.
+Open the qubit lab, [press H to start on the equator, switch noise on with $T_1 = 6\ \text{s}$ and $T_2 = 4\ \text{s}$](/lab/qubit?preset=noisy-equator), and press Let time pass. The arrow shortens and rises, and the readouts show the chance of 0, the purity and the fidelity changing. After about 3 seconds they match the worked example. Left to run, the arrow ends at the north pole.

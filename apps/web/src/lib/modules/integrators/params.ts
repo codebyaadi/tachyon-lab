@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -43,6 +44,37 @@ export const SPECS: ParamSpec[] = [
 		step: 0.001,
 		log: true,
 		help: 'Smaller steps lower every line. Notice which lines still climb.'
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<IntegratorsParams>[] = [
+	{
+		id: 'spring',
+		label: 'Spring, step 0.05',
+		summary:
+			"Euler's energy error climbs steadily while semi-implicit Euler and velocity Verlet stay in a narrow band.",
+		params: { problem: 'oscillator', length: 20, dt: 0.05 }
+	},
+	{
+		id: 'planet',
+		label: 'Planet around a star',
+		summary: 'The same pattern appears over many orbits of an eccentric orbit.',
+		params: { problem: 'orbit', length: 20, dt: 0.05 }
+	},
+	{
+		id: 'small-step-still-drifts',
+		label: 'A smaller step, a longer run',
+		summary:
+			"With dt = 0.01 over 100 periods, Euler's drift is slower but never stops, and RK4 eventually drifts too. Only the symplectic methods stay level.",
+		params: { problem: 'oscillator', length: 100, dt: 0.01 },
+		misconception: true
+	},
+	{
+		id: 'large-step',
+		label: 'A large step',
+		summary: "At dt = 0.1 Euler's error grows faster, as the factor 1 + ω²dt² says it should.",
+		params: { problem: 'oscillator', length: 20, dt: 0.1 }
 	}
 ];
 

@@ -8,11 +8,12 @@
 		slot,
 		SPECS,
 		VERSION
-	} from '#lib/modules/integrators/params.ts';
+	, PRESETS } from '#lib/modules/integrators/params.ts';
 	import AxisLabels from '#lib/shell/AxisLabels.svelte';
 	import { fmt } from '#lib/shell/format.ts';
 	import LabLessons from '#lib/shell/LabLessons.svelte';
 	import ParamPanel from '#lib/shell/ParamPanel.svelte';
+	import PresetPicker from '#lib/shell/PresetPicker.svelte';
 	import type { Range } from '#lib/shell/plotLayout.ts';
 	import { createSimHost } from '#lib/shell/simHost.svelte.ts';
 	import SimStatus from '#lib/shell/SimStatus.svelte';
@@ -27,6 +28,7 @@
 		specs: SPECS,
 		defaults: DEFAULTS,
 		version: VERSION,
+		presets: PRESETS,
 		readoutLen: READOUT_LEN,
 		label: 'Energy error of four integrators against time, on a log scale'
 	});
@@ -139,6 +141,8 @@
 	</section>
 
 	<aside class="space-y-5">
+		<PresetPicker presets={PRESETS} onapply={sim.applyPreset} active={sim.activePreset} />
+
 		<div class="panel p-4">
 			<h2 class="mb-3 text-sm font-semibold">Parameters</h2>
 			<ParamPanel specs={SPECS} values={params} onchange={sim.onParam} />

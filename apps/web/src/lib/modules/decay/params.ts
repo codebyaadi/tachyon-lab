@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -33,6 +34,29 @@ export const SPECS: ParamSpec[] = [
 			{ value: 'euler', label: 'Euler (1st order)' },
 			{ value: 'rk4', label: 'RK4 (4th order)' }
 		]
+	}
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<DecayParams>[] = [
+	{
+		id: 'euler-overshoots',
+		label: 'Euler at a coarse step',
+		summary: 'Euler uses only the slope at the start of each step, so it drifts away from the exact curve.',
+		params: { lambda: 1, y0: 1, dt: 0.5, method: 'euler' }
+	},
+	{
+		id: 'euler-unstable',
+		label: 'Euler goes unstable',
+		summary:
+			'With λ·dt above 2 the numerical curve oscillates and blows up. That is numerical instability, not physics.',
+		params: { lambda: 5, y0: 1, dt: 0.5, method: 'euler' }
+	},
+	{
+		id: 'rk4-same-step',
+		label: 'RK4 at the same step',
+		summary: 'The same step that wrecks Euler, with RK4: far more accurate for the same dt.',
+		params: { lambda: 1, y0: 1, dt: 0.5, method: 'rk4' }
 	}
 ];
 

@@ -119,7 +119,7 @@ Check: $\tfrac12 m v_\text{max}^2 = \tfrac12(2.0)(0.50^2) = 0.25\ \text{J}$.
 
 ## Common mistakes
 
-- **"A bigger swing takes longer."** For a spring the period does not depend on the amplitude. A larger swing is faster, not slower.
+- **"A bigger swing takes longer."** For a spring the period does not depend on the amplitude. A larger swing is faster, not slower. [See it in the lab](/lab/oscillator?preset=bigger-swing-same-period).
 - **Using degrees in the cosine.** $\omega t$ is in radians. Set your calculator to radians.
 - **Mixing up $\omega$ and $f$.** $\omega$ is in rad/s and the frequency $f = 1/T$ is in swings per second. They differ by a factor $2\pi$.
 - **Forgetting the minus sign.** The force always points back toward the middle. Without the minus sign the mass would run away instead of oscillating.
@@ -127,4 +127,4 @@ Check: $\tfrac12 m v_\text{max}^2 = \tfrac12(2.0)(0.50^2) = 0.25\ \text{J}$.
 
 ## Where this shows up in the lab
 
-Open the oscillator lab and set damping $\zeta = 0$ and the drive strength to $0$, so you get pure simple harmonic motion. Set the natural frequency to $2\ \text{rad/s}$ and check that one swing takes $2\pi/2 = 3.14\ \text{s}$. Switch the plot to phase space and you will see a closed loop: position against velocity, a perfect ellipse. Then choose Euler with a large time step and watch the loop spiral outward. That growth is not physics, it is the integrator adding energy. Continue with **Damped oscillations**.
+Open the [oscillator lab](/lab/oscillator?preset=simple-harmonic-motion) and set damping $\zeta = 0$ and the drive strength to $0$, so you get pure simple harmonic motion. Set the natural frequency to $2\ \text{rad/s}$ and check that one swing takes $2\pi/2 = 3.14\ \text{s}$. Switch the plot to phase space and you will see a closed loop: position against velocity, a perfect ellipse. Then [choose Euler with a large time step](/lab/oscillator?preset=euler-energy-growth) and watch the loop spiral outward. That growth is not physics, it is the integrator adding energy. Continue with **Damped oscillations**.

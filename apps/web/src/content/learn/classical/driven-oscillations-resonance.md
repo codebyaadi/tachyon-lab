@@ -112,11 +112,11 @@ $F/k = 1/50 = 0.02\ \text{m}$, so $Q = 0.1/0.02 = 5$, which agrees with $1/(2\ze
 
 ## Common mistakes
 
-- **Thinking resonance needs a large force.** The force can be tiny. The size of the response comes from the rhythm and the weak damping.
+- **Thinking resonance needs a large force.** The force can be tiny. The size of the response comes from the rhythm and the weak damping. [See it in the lab](/lab/oscillator?preset=tiny-force-resonance).
 - **Expecting the peak at exactly $\omega_0$ with heavy damping.** The peak moves lower, and for $\zeta > 0.71$ it disappears.
-- **Forgetting that the drive wins in the end.** After a transient, the motion is at the driving frequency, not the natural one.
+- **Forgetting that the drive wins in the end.** After a transient, the motion is at the driving frequency, not the natural one. [See it in the lab](/lab/oscillator?preset=drive-wins).
 - **Reading $Q$ as an energy.** It is a ratio of amplitudes, with no units.
 
 ## Where this shows up in the lab
 
-Open the oscillator lab, set the damping ratio $\zeta$ to $0.05$ and the natural frequency $\omega_0$ to $2\ \text{rad/s}$, and turn on a drive strength $F$. Sweep the drive frequency $\omega_d$ from low to high. The response swells as $\omega_d$ approaches $\omega_0$ and falls away again. Set $\zeta$ to $0$ and drive at exactly $\omega_0$ and the amplitude grows steadily with no limit. In phase space the motion spirals outward, and with damping it settles onto a steady loop.
+Open the [oscillator lab](/lab/oscillator?preset=resonance), set the damping ratio $\zeta$ to $0.05$ and the natural frequency $\omega_0$ to $2\ \text{rad/s}$, and turn on a drive strength $F$. Sweep the drive frequency $\omega_d$ from low to high. The response swells as $\omega_d$ approaches $\omega_0$ and falls away again. [Set $\zeta$ to $0$ and drive at exactly $\omega_0$](/lab/oscillator?preset=undamped-resonance) and the amplitude grows steadily with no limit. In phase space the motion spirals outward, and with damping it settles onto a steady loop.

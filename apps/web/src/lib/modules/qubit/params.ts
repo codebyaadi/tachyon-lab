@@ -1,4 +1,5 @@
 import type { ParamSpec } from '../../shell/params';
+import type { Preset } from '../../shell/presets';
 
 export const VERSION = 1;
 
@@ -124,6 +125,59 @@ export const SPECS: ParamSpec[] = [
 	{ kind: 'number', key: 'el', label: 'View: tilt', min: -80, max: 80, step: 5, unit: '°' },
 	// Not in the panel: the gate buttons build it.
 	{ kind: 'text', key: 'circuit', label: 'Circuit', pattern: CIRCUIT_PATTERN, maxLength: MAX_GATES * 8 }
+];
+
+/** Named setups, opened with ?preset=<id>. Ones marked as misconceptions show what a lesson's Common mistakes warn about. */
+export const PRESETS: Preset<QubitParams>[] = [
+	{
+		id: 'hadamard-t-hadamard',
+		label: 'H, T, H',
+		summary: 'The arrow lands at (0, −0.707, 0.707) with P(0) = 0.854.',
+		params: { start: 'zero', noise: 'off', circuit: 'H.T.H' }
+	},
+	{
+		id: 'equator-state',
+		label: 'A state on the equator',
+		summary: 'After H the arrow sits on the equator, an equal blend of |0⟩ and |1⟩. The poles are not the only states.',
+		params: { start: 'zero', noise: 'off', circuit: 'H' },
+		misconception: true
+	},
+	{
+		id: 'phase-gates-keep-p0',
+		label: 'S and T do not change P(0)',
+		summary: 'After H and then S, the arrow has turned about the vertical axis but P(0) is still 0.5.',
+		params: { start: 'zero', noise: 'off', circuit: 'H.S' },
+		misconception: true
+	},
+	{
+		id: 'noisy-equator',
+		label: 'Noise on the equator',
+		summary: 'T₁ = 6 s, T₂ = 4 s from the equator: the arrow shortens and rises toward |0⟩. Press Let time pass.',
+		params: { start: 'zero', noise: 'on', t1: 6, t2: 4, circuit: 'H' }
+	},
+	{
+		id: 'relaxation-raises-p0',
+		label: 'Noise can raise P(0)',
+		summary: 'Start in |1⟩ and let time pass: relaxation sends the qubit toward |0⟩, so P(0) rises from 0.',
+		params: { start: 'one', noise: 'on', t1: 6, t2: 4, circuit: '' },
+		misconception: true
+	},
+	{
+		id: 'two-clocks',
+		label: 'T₁ and T₂ are different clocks',
+		summary:
+			'From |+⟩ with T₁ = 20 s and T₂ = 1 s the arrow shrinks fast along the equator while P(0) stays close to 0.5 at first: T₂ is about phase, T₁ about energy.',
+		params: { start: 'plus', noise: 'on', t1: 20, t2: 1, circuit: '' },
+		misconception: true
+	},
+	{
+		id: 't2-capped',
+		label: 'T₂ cannot exceed 2T₁',
+		summary:
+			'Ask for T₂ = 10 s with T₁ = 2 s: the lab caps the effective T₂ at 4 s, because energy loss itself destroys phase.',
+		params: { start: 'plus', noise: 'on', t1: 2, t2: 10, circuit: '' },
+		misconception: true
+	}
 ];
 
 /** Start-state name → the number the wasm `QubitSim` expects. */
